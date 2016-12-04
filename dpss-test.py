@@ -1,10 +1,26 @@
-import re
-import word2vec
-import math
+import requests, json, re, word2vec, math
 from scipy import spatial
+import numpy
+
+from space_action import get_postagging, get_dependency
+
+def parse_text(parser, sentence, state = None):
+    parsedEx = parser(sentence)
+    # extract POS tagging from the parsed response
+    full_pos = get_postagging(parsedEx)
+    # extract dependency tree from parsed response
+    full_dep = get_dependency(parsedEx)
+    return full_pos, full_dep
+
+def get_root(full_dep):
+    root_word = ''
+    for each_dep in full_dep:
+        if each_dep[1] == 'ROOT':
+            root_word = each_dep[0].lower()
+    return root_word
 
 def getWords(data):
-    return re.compile(r"[\w']+").findall(data)
+    return re.compile(r"[\w]+").findall(data)
 
 def getWordsX(data):
     return re.compile(r"[\w'.]+").findall(data)
@@ -32,7 +48,7 @@ def flex(t):
 def agreg(t):
     sent = ''
     for each in t:
-        sent = sent + t + ' '
+        sent = sent + each + ' '
     return sent[:-1]
 
 def suit_sim(b, v):
@@ -173,40 +189,62 @@ def wo(t, t1, t2, model):
     #print r,q
     return (1 - r/q)
 
+def dp(t, t1, t2, d1, d2):
+    m1 = numpy.zeros((len(t),len(t)))
+    m2 = numpy.zeros((len(t),len(t)))
+    for each in d1:
+        try:
+            m1[t.index(each[0])][t.index(each[2])] = 1
+            m1[t.index(each[2])][t.index(each[0])] = 1
+        except Exception, e:
+            j = None
+    for each in d2:
+        try:
+            m2[t.index(each[0])][t.index(each[2])] = 1
+            m2[t.index(each[2])][t.index(each[0])] = 1
+        except Exception, e:
+            j = None
+    #print m1
+    #print m2
+    similarity_dp = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
+    #similarity_dp = 1 - numpy.linalg.norm(m1-m2)/numpy.linalg.norm(m1+m2)
+    return similarity_dp
+#dp(["hello", "a","b","c"],[],[],[],[])
+
+def advance_ssv(t, t1, t2):
+    v1 = []
+    v2 = []
+
+
 def test():
-    # ------------ common between two measurments ---------------------------- #
+    from spacy.en import English
+    parser = English()
     t1 = "a quick brown dog jumps over the lazy fox"
     t2 = "a quick brown fox jumps over the lazy dog"
     t2 = "jumps over the lazy fox is a quick brown dog"
-    #t1 = "Amrozi accused his brother, whom he called the witness, of deliberately distorting his evidence.".lower()
-    #t2 = "Referring to him as only the witness, Amrozi accused his brother of deliberately distorting his evidence.".lower()
-    #t1 = "i have to find you, tell me you need me."
-    #t2 = "don't wanna know who is taking you home"
+    sentence_1 = unicode(t1, "utf-8")
+    p1, d1 = parse_text(parser, sentence_1, 1)
+    sentence_2 = unicode(t2, "utf-8")
+    p2, d2 = parse_text(parser, sentence_2, 1)
     t1 = getWords(t1)
     t2 = getWords(t2)
     t1 = flex(t1)
     t2 = flex(t2)
     t = union(t1, t2)
-    #t = ["a", "brown", "jumps", "the", "fox", "dog", "quick", "over", "lazy"]
-    print t
+    #print d1
+    #print d2
+    similarity_dp = dp(t, t1, t2, d1, d2)
+    print similarity_dp
 
-    model = word2vec.load('./latents.bin')
-    # -------------- sementic similarity between two sentences --------------- #
-    similarity_ssv = ssv(t, t1, t2, model)
-    print 'ssv ', similarity_ssv
-
-    # ----------------- word similarity between sentences -------------------- #
-    similarity_wo = wo(t, t1, t2, model)
-    print 'wo ', similarity_wo
-
-    alpha = 0.8
-    print alpha*similarity_ssv + (1-alpha)*similarity_wo
-
+#test()
 def predict():
+    from spacy.en import English
+    parser = English()
     model = word2vec.load('./latents.bin')
     predictions = []
     with open('MSRParaphraseCorpus/MSR_easy.txt') as f:
         data = f.readlines()
+    f = open('testdata/output-2.txt', 'w')
     block = []
     for each in data:
         block.append(flex(getWords(each.lower())))
@@ -215,6 +253,14 @@ def predict():
         if int(block[i][0]) - int(block[i+1][0]) < 200 and int(block[i][0]) - int(block[i+1][0]) > -200:
             t1 = block[i][1:]
             t2 = block[i+1][1:]
+            s1 = agreg(t1)
+            s2 = agreg(t2)
+            s1 = unicode(s1, "utf-8")
+            p1, d1 = parse_text(parser, s1, 1)
+            s2 = unicode(s2, "utf-8")
+            p2, d2 = parse_text(parser, s2, 1)
+            t1 = flex(t1)
+            t2 = flex(t2)
             t = union(t1, t2)
             # -------------- sementic similarity between two sentences ------- #
             similarity_ssv = ssv(t, t1, t2, model)
@@ -224,27 +270,48 @@ def predict():
             similarity_wo = wo(t, t1, t2, model)
             #print 'wo ', similarity_wo
 
-            alpha = 0.8
-            similarity = alpha*similarity_ssv + (1-alpha)*similarity_wo
-            print similarity, str(block[i][0]), str(block[i+1][0])
-            predictions.append([similarity, str(block[i][0]), str(block[i+1][0])])
+            # ---- dependency matrix based similarity ------------------------ #
+            similarity_dp = dp(t, t1, t2, d1, d2)
+
+            #alpha = 0.8
+            z = 0
+            similarity = float(distr[z][0])*similarity_ssv + float(distr[z][1])*similarity_wo + float(distr[z][2])*similarity_dp
+            with open('testdata/output-testing.txt', 'a') as f:
+                f.write(str(similarity))
+                f.write(' ')
+                f.write(str(block[i][0]))
+                f.write(' ')
+                f.write(str(block[i+1][0]))
+                f.write('\n')
+            #similarity = 0.75*similarity_ssv + 0.15*similarity_wo + 0.10*similarity_dp
+            print i, i+1
+            '''f.write(str(similarity))
+            f.write(' ')
+            f.write(str(block[i][0]))
+            f.write(' ')
+            f.write(str(block[i+1][0]))
+            f.write('\n')'''
+            #predictions.append([similarity, str(block[i][0]), str(block[i+1][0])])
             i = i + 2
         else:
             i = i + 1
-
 
 def cross():
     # ------------ comparing with both test and train as we have not
     # -------- trained any model using trainset ------------------------------ #
     #thresh = 0.54
-    thresh = 0.56
+    m_accuracy = 0
+    m_z = 0
+    m_thresh = 0
+    thols = [0.45,0.47,0.49,0.50,0.51,0.52,0.53,0.54,0.55,0.56,0.58,0.60]
+    thresh = 0.54
     s1 = 0
     s2 = 0
     s3 = 0
     s4 = 0
     neg = 0
     pos = 0
-    with open('MSRParaphraseCorpus/output-ssv-wo.txt') as f:
+    with open('testdata/output-testing.txt') as f:
         mypredictions = f.readlines()
     with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
         MSRtrain = f.readlines()
@@ -262,6 +329,10 @@ def cross():
     #print len(test), len(train), len(predictions)
     #print type(predictions[0][0]), type(predictions[1][1]), type(predictions[2][2])
     #print predictions[0][0], predictions[1][1], predictions[2][2]
+    s1 = 0
+    s2 = 0
+    s3 = 0
+    s4 = 0
     neg = 0
     pos = 0
     i = 1
@@ -327,6 +398,8 @@ def cross():
     true_negative = float(s3)
     precision = (float(true_positive)) / (float(true_positive) + float(false_positive))
     recall = (float(true_positive)) / (float(true_positive) + float(false_negative))
+    F1 = 2*precision*recall/(precision+recall)
+    accuracy = (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
     #print 'total ', total
     print 'true_positive ', true_positive
     print 'false_negative ', false_negative
@@ -334,9 +407,7 @@ def cross():
     print 'false_positive ', false_positive
     print 'precision ', precision
     print 'recall ', recall
-    print 'F1 ', 2*precision*recall/(precision+recall)
-    print 'accuracy ', (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
-
-#test()
+    print 'F1 ', F1
+    print 'accuracy ', accuracy
 #predict()
 cross()
