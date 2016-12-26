@@ -206,16 +206,16 @@ def dp(t, t1, t2, d1, d2):
         try:
             m1[t.index(each[0])][t.index(each[2])] = 1
             m1[t.index(each[2])][t.index(each[0])] = 1
-            #m1[t.index(each[0])][t.index(each[0])] = 1
-            #m1[t.index(each[2])][t.index(each[2])] = 1
+            m1[t.index(each[0])][t.index(each[0])] = 1
+            m1[t.index(each[2])][t.index(each[2])] = 1
         except Exception, e:
             j = None
     for each in d2:
         try:
             m2[t.index(each[0])][t.index(each[2])] = 1
             m2[t.index(each[2])][t.index(each[0])] = 1
-            #m2[t.index(each[0])][t.index(each[0])] = 1
-            #m2[t.index(each[2])][t.index(each[2])] = 1
+            m2[t.index(each[0])][t.index(each[0])] = 1
+            m2[t.index(each[2])][t.index(each[2])] = 1
         except Exception, e:
             j = None
     #for i in range(len(t)):
@@ -246,7 +246,7 @@ def test():
     model = word2vec.load('./latents.bin')
     t1 = "a quick brown dog jumps over the lazy fox"
     t2 = "a quick brown fox jumps over the lazy dog"
-    t2 = "he is a brown dog"
+    #t2 = "he is a brown fox"
     #t2 = "jumps over the lazy fox is a quick brown dog"
     sentence_1 = unicode(t1, "utf-8")
     p1, d1 = parse_text(parser, sentence_1, 1)
