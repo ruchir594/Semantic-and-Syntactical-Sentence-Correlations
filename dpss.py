@@ -294,7 +294,6 @@ def predict():
             # ---- dependency matrix based similarity ------------------------ #
             similarity_dp = dp(t, t1, t2, d1, d2)
             #similarity_dp = 0
-
             #alpha = 0.8
             z = 0
             while z < len(distr):
