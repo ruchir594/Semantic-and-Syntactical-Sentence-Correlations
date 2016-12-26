@@ -74,16 +74,18 @@ def ssv(t, t1, t2, model):
         try:
             baset1 = model[t1[i]]
         except Exception, e:
+
             baset1 = [0] * 99
             baset1.append(0.001)
+            baset1 = numpy.random.rand(100,1)
             #print "word not found v1 ssv " + t1[i]
         v1.append(baset1)
     for i in range(len(t2)):
         try:
             baset2 = model[t2[i]]
         except Exception, e:
-            baset2 = [0] * 99
-            baset2.append(0.001)
+            baset2 = numpy.random.rand(100,1)
+            #baset2.append(0.001)
             #print "word not found v2 ssv " + t2[i]
         v2.append(baset2)
     #print v1, v2
@@ -97,6 +99,7 @@ def ssv(t, t1, t2, model):
             except Exception, e:
                 baset = [0] * 99
                 baset.append(0.001)
+                baset = numpy.random.rand(100,1)
                 #print "word not found t[i] ssv " + t[i]
             s1.append(suit_sim(baset, v1))
         if t[i] in t2:
@@ -107,6 +110,7 @@ def ssv(t, t1, t2, model):
             except Exception, e:
                 baset = [0] * 99
                 baset.append(0.001)
+                baset = numpy.random.rand(100,1)
                 #print "word not found t[i] ssv " + t[i]
             s2.append(suit_sim(baset, v2))
     #print 'sss ',s1, s2
@@ -146,6 +150,7 @@ def wo(t, t1, t2, model):
         except Exception, e:
             baset1 = [0] * 99
             baset1.append(0.001)
+            baset1 = numpy.random.rand(100,1)
             #print "word not found v1 wo " + t1[i]
         v1.append(baset1)
     for i in range(len(t2)):
@@ -154,6 +159,7 @@ def wo(t, t1, t2, model):
         except Exception, e:
             baset2 = [0] * 99
             baset2.append(0.001)
+            baset2 = numpy.random.rand(100,1)
             #print "word not found v2 wo " + t2[i]
         v2.append(baset2)
 
@@ -166,6 +172,7 @@ def wo(t, t1, t2, model):
             except Exception, e:
                 baset = [0] * 99
                 baset.append(0.001)
+                baset = numpy.random.rand(100,1)
                 #print "word not found t[i] wo " + t[i]
             r1.append(suit_index(baset, v1))
         if t[i] in t2:
@@ -176,6 +183,7 @@ def wo(t, t1, t2, model):
             except Exception, e:
                 baset = [0] * 99
                 baset.append(0.001)
+                baset = numpy.random.rand(100,1)
                 #print "word not found t[i] wo " + t[i]
             r2.append(suit_index(baset, v2))
     #print r1, r2
@@ -246,6 +254,9 @@ def predict():
              [0.7,0.22,0.08],[0.7,0.23,0.07],[0.7,0.24,0.06],[0.7,0.08,0.22],[0.7,0.06,0.24],
              [0.8,0.02,0.18],[0.8,0.04,0.16],[0.8,0.06,0.14],[0.8,0.08,0.12],[0.8,0.1,0.1],[0.8,0.12,0.08],
              [0.8,0.14,0.06],[0.8,0.16,0.04],[0.8,0.18,0.02],[0.8,0.2,0],[0.8,0,0.2]]
+    distr = [[0.8,0.2,0],[0.79,0.21,0],[0.78,0.22,0],[0.77,0.23,0],[0.76,0.24,0],[0.75,0.25,0],[0.74,0.26,0],[0.73,0.27,0],[0.72,0.28,0],[0.71,0.29,0],
+             [0.81,0.19,0],[0.82,0.18,0],[0.83,0.17,0],[0.84,0.16,0],[0.85,0.15,0]]
+    distr = [[0.8,0.2,0],[0.76,0.19,0.05],[0.72,0.18,0.1]]
     predictions = []
     with open('MSRParaphraseCorpus/MSR_easy.txt') as f:
         data = f.readlines()
@@ -277,6 +288,7 @@ def predict():
 
             # ---- dependency matrix based similarity ------------------------ #
             similarity_dp = dp(t, t1, t2, d1, d2)
+            #similarity_dp = 0
 
             #alpha = 0.8
             z = 0
@@ -291,7 +303,7 @@ def predict():
                     f.write('\n')
                 z = z + 1
             #similarity = 0.75*similarity_ssv + 0.15*similarity_wo + 0.10*similarity_dp
-            print i, i+1
+            #print i, i+1
             '''f.write(str(similarity))
             f.write(' ')
             f.write(str(block[i][0]))
@@ -310,7 +322,8 @@ def cross():
     m_accuracy = 0
     m_z = 0
     m_thresh = 0
-    thols = [0.45,0.47,0.49,0.50,0.51,0.52,0.53,0.54,0.55,0.56,0.58,0.60]
+    thols = [0.45,0.47,0.49,0.50,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.60]
+    #thols = [0.55,0.555,0.558,0.5585,0.559,0.5595,0.56,0.561,0.562,0.565,0.57]
     thresh = 0.54
     s1 = 0
     s2 = 0
@@ -338,7 +351,7 @@ def cross():
     #print predictions[0][0], predictions[1][1], predictions[2][2]
     z = 0
     y = 0
-    while z < 28:
+    while z < 3:
         with open('testdata/output-'+str(z)+'.txt') as f:
             mypredictions = f.readlines()
         predictions = []
@@ -416,6 +429,7 @@ def cross():
             recall = (float(true_positive)) / (float(true_positive) + float(false_negative))
             F1 = 2*precision*recall/(precision+recall)
             accuracy = (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)
+            print z, thresh, accuracy
             if accuracy > m_accuracy:
                 m_accuracy = accuracy
                 m_z = z
@@ -441,7 +455,8 @@ def cross():
             print 'accuracy ', (true_positive + true_negative) / (true_positive + true_negative + false_positive + false_negative)'''
         print z
         z = z + 1
+    print '---------------------------------------'
     print m_z, m_thresh
     print m_accuracy
-#predict()
+predict()
 cross()

@@ -1,7 +1,7 @@
 import requests, json, re, word2vec, math
 from scipy import spatial
 import numpy
-
+import word2vec
 from space_action import get_postagging, get_dependency
 
 def parse_text(parser, sentence, state = None):
@@ -54,8 +54,11 @@ def agreg(t):
 def suit_sim(b, v):
     delta = 0.6
     r = []
+    #print type(b)
     for each in v:
+        #print type(each)
         r.append(1 - spatial.distance.cosine(b, each))
+        #print 1 - spatial.distance.cosine(b, each)
     m = max(r)
     if m > delta:
         return m
@@ -76,6 +79,7 @@ def ssv(t, t1, t2, model):
         except Exception, e:
             baset1 = [0] * 99
             baset1.append(0.001)
+            baset1 = numpy.random.rand(100,1)
             #print "word not found v1 ssv " + t1[i]
         v1.append(baset1)
     for i in range(len(t2)):
@@ -84,6 +88,7 @@ def ssv(t, t1, t2, model):
         except Exception, e:
             baset2 = [0] * 99
             baset2.append(0.001)
+            baset2 = numpy.random.rand(100,1)
             #print "word not found v2 ssv " + t2[i]
         v2.append(baset2)
     #print v1, v2
@@ -95,9 +100,12 @@ def ssv(t, t1, t2, model):
             try:
                 baset = model[t[i]]
             except Exception, e:
+                #print 'exception at ' + t[i]
                 baset = [0] * 99
                 baset.append(0.001)
+                baset = numpy.random.rand(100,1)
                 #print "word not found t[i] ssv " + t[i]
+            #print suit_sim(baset, v1)
             s1.append(suit_sim(baset, v1))
         if t[i] in t2:
             s2.append(1)
@@ -105,8 +113,10 @@ def ssv(t, t1, t2, model):
             try:
                 baset = model[t[i]]
             except Exception, e:
+                #print 'exception at ' + t[i]
                 baset = [0] * 99
                 baset.append(0.001)
+                baset = numpy.random.rand(100,1)
                 #print "word not found t[i] ssv " + t[i]
             s2.append(suit_sim(baset, v2))
     #print 'sss ',s1, s2
@@ -196,18 +206,32 @@ def dp(t, t1, t2, d1, d2):
         try:
             m1[t.index(each[0])][t.index(each[2])] = 1
             m1[t.index(each[2])][t.index(each[0])] = 1
+            #m1[t.index(each[0])][t.index(each[0])] = 1
+            #m1[t.index(each[2])][t.index(each[2])] = 1
         except Exception, e:
             j = None
     for each in d2:
         try:
             m2[t.index(each[0])][t.index(each[2])] = 1
             m2[t.index(each[2])][t.index(each[0])] = 1
+            #m2[t.index(each[0])][t.index(each[0])] = 1
+            #m2[t.index(each[2])][t.index(each[2])] = 1
         except Exception, e:
             j = None
+    #for i in range(len(t)):
+    #    m1[i][i] = 1
+    #    m2[i][i] = 1
+
     #print m1
     #print m2
+    #print m1 - m2
+    #print numpy.count_nonzero(m1-m2)
+    #print numpy.count_nonzero(m2)
     similarity_dp = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
+    print 'norm ', similarity_dp
     #similarity_dp = 1 - numpy.linalg.norm(m1-m2)/numpy.linalg.norm(m1+m2)
+    similarity_dp = 1 - float(numpy.count_nonzero(m1-m2)) / float((numpy.count_nonzero(m1) + numpy.count_nonzero(m2)))
+    print 'cnze ', similarity_dp
     return similarity_dp
 #dp(["hello", "a","b","c"],[],[],[],[])
 
@@ -219,9 +243,11 @@ def advance_ssv(t, t1, t2):
 def test():
     from spacy.en import English
     parser = English()
+    model = word2vec.load('./latents.bin')
     t1 = "a quick brown dog jumps over the lazy fox"
     t2 = "a quick brown fox jumps over the lazy dog"
-    t2 = "jumps over the lazy fox is a quick brown dog"
+    t2 = "he is a brown dog"
+    #t2 = "jumps over the lazy fox is a quick brown dog"
     sentence_1 = unicode(t1, "utf-8")
     p1, d1 = parse_text(parser, sentence_1, 1)
     sentence_2 = unicode(t2, "utf-8")
@@ -234,7 +260,13 @@ def test():
     #print d1
     #print d2
     similarity_dp = dp(t, t1, t2, d1, d2)
-    print similarity_dp
+    # -------------- sementic similarity between two sentences ------- #
+    similarity_ssv = ssv(t, t1, t2, model)
+    #print 'ssv ', similarity_ssv
+
+    # ----------------- word similarity between sentences ------------ #
+    similarity_wo = wo(t, t1, t2, model)
+    print similarity_ssv, similarity_wo, similarity_dp
 
 #test()
 def predict():
@@ -409,5 +441,6 @@ def cross():
     print 'recall ', recall
     print 'F1 ', F1
     print 'accuracy ', accuracy
+test()
 #predict()
-cross()
+#cross()
