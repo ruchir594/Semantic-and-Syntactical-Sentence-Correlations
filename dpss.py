@@ -218,10 +218,11 @@ def dp(t, t1, t2, d1, d2):
             j = None
     #print m1
     #print m2
-    #similarity_dp = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
-    similarity_dp = 1 - float(numpy.count_nonzero(m1-m2)) / float((numpy.count_nonzero(m1) + numpy.count_nonzero(m2)))
+    similarity_dp_1 = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
+    similarity_dp_2 = 1 - float(numpy.count_nonzero(m1-m2)) / float((numpy.count_nonzero(m1) + numpy.count_nonzero(m2)))
     #similarity_dp = 1 - numpy.linalg.norm(m1-m2)/numpy.linalg.norm(m1+m2)
-    return similarity_dp
+    return similarity_dp_1
+    return (similarity_dp_1 + similarity_dp_2) / 2
 #dp(["hello", "a","b","c"],[],[],[],[])
 
 def advance_ssv(t, t1, t2):
@@ -261,7 +262,7 @@ def predict():
              [0.8,0.14,0.06],[0.8,0.16,0.04],[0.8,0.18,0.02],[0.8,0.2,0],[0.8,0,0.2]]
     distr = [[0.8,0.2,0],[0.79,0.21,0],[0.78,0.22,0],[0.77,0.23,0],[0.76,0.24,0],[0.75,0.25,0],[0.74,0.26,0],[0.73,0.27,0],[0.72,0.28,0],[0.71,0.29,0],
              [0.81,0.19,0],[0.82,0.18,0],[0.83,0.17,0],[0.84,0.16,0],[0.85,0.15,0]]
-    distr = [[0.8,0.2,0],[0.76,0.19,0.05],[0.72,0.18,0.1],[0.78,0.22,0],[0.78,0.11,0.11],[0.78,0.12,0.1],[0.78,0.1,0.12]]
+    #distr = [[0.8,0.2,0],[0.76,0.19,0.05],[0.72,0.18,0.1],[0.78,0.22,0],[0.78,0.11,0.11],[0.78,0.12,0.1],[0.78,0.1,0.12]]
     predictions = []
     with open('MSRParaphraseCorpus/MSR_easy.txt') as f:
         data = f.readlines()
@@ -355,7 +356,7 @@ def cross():
     #print predictions[0][0], predictions[1][1], predictions[2][2]
     z = 0
     y = 0
-    while z < 7:
+    while z < 15:
         with open('testdata/output-'+str(z)+'.txt') as f:
             mypredictions = f.readlines()
         predictions = []

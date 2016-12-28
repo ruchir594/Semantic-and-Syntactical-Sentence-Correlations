@@ -156,6 +156,7 @@ def wo(t, t1, t2, model):
         except Exception, e:
             baset1 = [0] * 99
             baset1.append(0.001)
+            baset1 = numpy.random.rand(100,1)
             #print "word not found v1 wo " + t1[i]
         v1.append(baset1)
     for i in range(len(t2)):
@@ -164,6 +165,7 @@ def wo(t, t1, t2, model):
         except Exception, e:
             baset2 = [0] * 99
             baset2.append(0.001)
+            baset2 = numpy.random.rand(100,1)
             #print "word not found v2 wo " + t2[i]
         v2.append(baset2)
 
@@ -176,6 +178,7 @@ def wo(t, t1, t2, model):
             except Exception, e:
                 baset = [0] * 99
                 baset.append(0.001)
+                baset = numpy.random.rand(100,1)
                 #print "word not found t[i] wo " + t[i]
             r1.append(suit_index(baset, v1))
         if t[i] in t2:
@@ -186,6 +189,7 @@ def wo(t, t1, t2, model):
             except Exception, e:
                 baset = [0] * 99
                 baset.append(0.001)
+                baset = numpy.random.rand(100,1)
                 #print "word not found t[i] wo " + t[i]
             r2.append(suit_index(baset, v2))
     #print r1, r2
@@ -199,39 +203,70 @@ def wo(t, t1, t2, model):
     #print r,q
     return (1 - r/q)
 
-def dp(t, t1, t2, d1, d2):
+def dp(t, t1, t2, d1, d2, model):
+    v1 = []
+    v2 = []
+    for i in range(len(t1)):
+        try:
+            baset1 = model[t1[i]]
+        except Exception, e:
+            baset1 = [0] * 99
+            baset1.append(0.001)
+            baset1 = numpy.random.rand(100,1)
+            #print "word not found v1 wo " + t1[i]
+        v1.append(baset1)
+    for i in range(len(t2)):
+        try:
+            baset2 = model[t2[i]]
+        except Exception, e:
+            baset2 = [0] * 99
+            baset2.append(0.001)
+            baset2 = numpy.random.rand(100,1)
+            #print "word not found v2 wo " + t2[i]
+        v2.append(baset2)
+    # not the v1 and v2 have all vectors
     m1 = numpy.zeros((len(t),len(t)))
     m2 = numpy.zeros((len(t),len(t)))
-    for each in d1:
-        try:
-            m1[t.index(each[0])][t.index(each[2])] = 1
-            m1[t.index(each[2])][t.index(each[0])] = 1
-            m1[t.index(each[0])][t.index(each[0])] = 1
-            m1[t.index(each[2])][t.index(each[2])] = 1
-        except Exception, e:
-            j = None
-    for each in d2:
-        try:
-            m2[t.index(each[0])][t.index(each[2])] = 1
-            m2[t.index(each[2])][t.index(each[0])] = 1
-            m2[t.index(each[0])][t.index(each[0])] = 1
-            m2[t.index(each[2])][t.index(each[2])] = 1
-        except Exception, e:
-            j = None
-    #for i in range(len(t)):
-    #    m1[i][i] = 1
-    #    m2[i][i] = 1
+    for i in range(len(t)):
+        if t[i] in t1:
+            m1[i][i] = 1*4
+        else:
+            try:
+                baset = model[t[i]]
+            except Exception, e:
+                baset = numpy.random.rand(100,1)
+            m1[i][i] = suit_sim(baset, v1)*4
+        if t[i] in t2:
+            m2[i][i] = 1*4
+        else:
+            try:
+                baset = model[t[i]]
+            except Exception, e:
+                baset = numpy.random.rand(100,1)
+            m2[i][i] = suit_sim(baset, v2)*4
+    for i in range(len(d1)):
+        d1[i][1] = 'DEP'
+        d1[i][3] = []
+        d1[i][4] = []
+    for i in range(len(d2)):
+        d2[i][1] = 'DEP'
+        d2[i][3] = []
+        d2[i][4] = []
+    for i in range(len(t)):
+        for j in range(len(t)):
+            if [t[i],'DEP',t[j],[],[]] in d1:
+                m1[i][j] = 1
+                m1[j][i] = 1
+            if [t[i],'DEP',t[j],[],[]] in d2:
+                m2[i][j] = 1
+                m2[j][i] = 1
 
-    #print m1
-    #print m2
-    #print m1 - m2
-    #print numpy.count_nonzero(m1-m2)
-    #print numpy.count_nonzero(m2)
-    similarity_dp = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
-    print 'norm ', similarity_dp
-    #similarity_dp = 1 - numpy.linalg.norm(m1-m2)/numpy.linalg.norm(m1+m2)
+    print m1
+    print m2
     similarity_dp = 1 - float(numpy.count_nonzero(m1-m2)) / float((numpy.count_nonzero(m1) + numpy.count_nonzero(m2)))
     print 'cnze ', similarity_dp
+    similarity_dp = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
+    print 'norm ', similarity_dp
     return similarity_dp
 #dp(["hello", "a","b","c"],[],[],[],[])
 
@@ -245,7 +280,7 @@ def test():
     parser = English()
     model = word2vec.load('./latents.bin')
     t1 = "a quick brown dog jumps over the lazy fox"
-    t2 = "a quick brown fox jumps over the lazy dog"
+    t2 = "a fast brown fox jumps over the lazy dog"
     #t2 = "he is a brown fox"
     #t2 = "jumps over the lazy fox is a quick brown dog"
     sentence_1 = unicode(t1, "utf-8")
@@ -259,7 +294,8 @@ def test():
     t = union(t1, t2)
     #print d1
     #print d2
-    similarity_dp = dp(t, t1, t2, d1, d2)
+    similarity_dp = dp(t, t1, t2, d1, d2, model)
+    similarity_dp = dp_old(t, t1, t2, d1, d2)
     # -------------- sementic similarity between two sentences ------- #
     similarity_ssv = ssv(t, t1, t2, model)
     #print 'ssv ', similarity_ssv
@@ -441,6 +477,34 @@ def cross():
     print 'recall ', recall
     print 'F1 ', F1
     print 'accuracy ', accuracy
+
+def dp_old(t, t1, t2, d1, d2):
+    m1 = numpy.zeros((len(t),len(t)))
+    m2 = numpy.zeros((len(t),len(t)))
+    for each in d1:
+        try:
+            m1[t.index(each[0])][t.index(each[2])] = 1
+            m1[t.index(each[2])][t.index(each[0])] = 1
+            m1[t.index(each[0])][t.index(each[0])] = 1
+            m1[t.index(each[2])][t.index(each[2])] = 1
+        except Exception, e:
+            j = None
+    for each in d2:
+        try:
+            m2[t.index(each[0])][t.index(each[2])] = 1
+            m2[t.index(each[2])][t.index(each[0])] = 1
+            m2[t.index(each[0])][t.index(each[0])] = 1
+            m2[t.index(each[2])][t.index(each[2])] = 1
+        except Exception, e:
+            j = None
+    print m1
+    print m2
+    similarity_dp_1 = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
+    similarity_dp_2 = 1 - float(numpy.count_nonzero(m1-m2)) / float((numpy.count_nonzero(m1) + numpy.count_nonzero(m2)))
+    #similarity_dp = 1 - numpy.linalg.norm(m1-m2)/numpy.linalg.norm(m1+m2)
+    print 'old similarity_dp ', similarity_dp_1
+    return similarity_dp_1
+
 test()
 #predict()
 #cross()
