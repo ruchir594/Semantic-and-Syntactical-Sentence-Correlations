@@ -1,8 +1,8 @@
-true_positive 2817.0
-false_negative 33.0
-true_negative 62.0
-false_positive 1216.0
-precision 0.698487478304
-recall 0.988421052632
-F1 0.818538428011
-accuracy 0.697432170543
+true_positive 3713.0
+false_negative 187.0
+true_negative 295.0
+false_positive 1606.0
+precision 0.698063545779
+recall 0.952051282051
+F1 0.805510359041
+accuracy 0.690915359421

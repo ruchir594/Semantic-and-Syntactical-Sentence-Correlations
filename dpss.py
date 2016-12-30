@@ -197,32 +197,72 @@ def wo(t, t1, t2, model):
     #print r,q
     return (1 - r/q)
 
-def dp(t, t1, t2, d1, d2):
+def dp(t, t1, t2, d1, d2, model):
+    weight = 4
+    v1 = []
+    v2 = []
+    for i in range(len(t1)):
+        try:
+            baset1 = model[t1[i]]
+        except Exception, e:
+            baset1 = [0] * 99
+            baset1.append(0.001)
+            baset1 = numpy.random.rand(100,1)
+            #print "word not found v1 wo " + t1[i]
+        v1.append(baset1)
+    for i in range(len(t2)):
+        try:
+            baset2 = model[t2[i]]
+        except Exception, e:
+            baset2 = [0] * 99
+            baset2.append(0.001)
+            baset2 = numpy.random.rand(100,1)
+            #print "word not found v2 wo " + t2[i]
+        v2.append(baset2)
+    # not the v1 and v2 have all vectors
     m1 = numpy.zeros((len(t),len(t)))
     m2 = numpy.zeros((len(t),len(t)))
-    for each in d1:
-        try:
-            m1[t.index(each[0])][t.index(each[2])] = 1
-            m1[t.index(each[2])][t.index(each[0])] = 1
-            m1[t.index(each[0])][t.index(each[0])] = 1
-            m1[t.index(each[2])][t.index(each[2])] = 1
-        except Exception, e:
-            j = None
-    for each in d2:
-        try:
-            m2[t.index(each[0])][t.index(each[2])] = 1
-            m2[t.index(each[2])][t.index(each[0])] = 1
-            m2[t.index(each[0])][t.index(each[0])] = 1
-            m2[t.index(each[2])][t.index(each[2])] = 1
-        except Exception, e:
-            j = None
+    for i in range(len(t)):
+        if t[i] in t1:
+            m1[i][i] = 1*weight
+        else:
+            try:
+                baset = model[t[i]]
+            except Exception, e:
+                baset = numpy.random.rand(100,1)
+            m1[i][i] = suit_sim(baset, v1)*weight
+        if t[i] in t2:
+            m2[i][i] = 1*weight
+        else:
+            try:
+                baset = model[t[i]]
+            except Exception, e:
+                baset = numpy.random.rand(100,1)
+            m2[i][i] = suit_sim(baset, v2)*weight
+    for i in range(len(d1)):
+        d1[i][1] = 'DEP'
+        d1[i][3] = []
+        d1[i][4] = []
+    for i in range(len(d2)):
+        d2[i][1] = 'DEP'
+        d2[i][3] = []
+        d2[i][4] = []
+    for i in range(len(t)):
+        for j in range(len(t)):
+            if [t[i],'DEP',t[j],[],[]] in d1:
+                m1[i][j] = 1
+                m1[j][i] = 1
+            if [t[i],'DEP',t[j],[],[]] in d2:
+                m2[i][j] = 1
+                m2[j][i] = 1
+
     #print m1
     #print m2
-    similarity_dp_1 = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
-    similarity_dp_2 = 1 - float(numpy.count_nonzero(m1-m2)) / float((numpy.count_nonzero(m1) + numpy.count_nonzero(m2)))
-    #similarity_dp = 1 - numpy.linalg.norm(m1-m2)/numpy.linalg.norm(m1+m2)
-    return similarity_dp_1
-    return (similarity_dp_1 + similarity_dp_2) / 2
+    similarity_dp = 1 - float(numpy.count_nonzero(m1-m2)) / float((numpy.count_nonzero(m1) + numpy.count_nonzero(m2)))
+    #print 'cnze ', similarity_dp
+    similarity_dp = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
+    #print 'norm ', similarity_dp
+    return similarity_dp
 #dp(["hello", "a","b","c"],[],[],[],[])
 
 def advance_ssv(t, t1, t2):
@@ -247,78 +287,80 @@ def test():
     t = union(t1, t2)
     #print d1
     #print d2
-    similarity_dp = dp(t, t1, t2, d1, d2)
+    similarity_dp = dp(t, t1, t2, d1, d2, model)
     print similarity_dp
 
-#test()
+distr = [[0.7,0.2,0.1],[0.7,0.19,0.11],[0.7,0.18,0.12],[0.7,0.17,0.13],[0.7,0.16,0.14],[0.7,0.15,0.15],
+         [0.7,0.14,0.15],[0.7,0.13,0.16],[0.7,0.12,0.17],[0.7,0.11,0.19],[0.7,0.1,0.2],[0.7,0.21,0.09],
+         [0.7,0.22,0.08],[0.7,0.23,0.07],[0.7,0.24,0.06],[0.7,0.08,0.22],[0.7,0.06,0.24],
+         [0.8,0.02,0.18],[0.8,0.04,0.16],[0.8,0.06,0.14],[0.8,0.08,0.12],[0.8,0.1,0.1],[0.8,0.12,0.08],
+         [0.8,0.14,0.06],[0.8,0.16,0.04],[0.8,0.18,0.02],[0.8,0.2,0],[0.8,0,0.2]]
+distr = [[0.8,0.2,0],[0.79,0.21,0],[0.78,0.22,0],[0.77,0.23,0],[0.76,0.24,0],[0.75,0.25,0],[0.74,0.26,0],[0.73,0.27,0],[0.72,0.28,0],[0.71,0.29,0],
+         [0.81,0.19,0],[0.82,0.18,0],[0.83,0.17,0],[0.84,0.16,0],[0.85,0.15,0]]
+distr = [[0.8,0.2,0],[0.76,0.19,0.05],[0.72,0.18,0.1],[0.78,0.22,0],[0.78,0.11,0.11],[0.78,0.12,0.1],[0.78,0.1,0.12]]
+distr = [[0,0,1],[0,0.2,0.8],[0,0.19,0.81],[0,0.18,0.82],[0,0.17,0.83],[0,0.16,0.84],[0,0.21,0.79],[0,0.23,0.77],[0,0.24,0.76],[0,0.3,0.7],
+         [0,0.4,0.6],[0.4,0.2,0.4],[0.3,0.3,0.4],[0.33,0.33,0.34],[0.5,0,0.5]]
+distr = [[1,0,0],[0,1,0],[0,0,1]]
+#len(distr)
 def predict():
     from spacy.en import English
     parser = English()
     model = word2vec.load('./latents.bin')
-    distr = [[0.7,0.2,0.1],[0.7,0.19,0.11],[0.7,0.18,0.12],[0.7,0.17,0.13],[0.7,0.16,0.14],[0.7,0.15,0.15],
-             [0.7,0.14,0.15],[0.7,0.13,0.16],[0.7,0.12,0.17],[0.7,0.11,0.19],[0.7,0.1,0.2],[0.7,0.21,0.09],
-             [0.7,0.22,0.08],[0.7,0.23,0.07],[0.7,0.24,0.06],[0.7,0.08,0.22],[0.7,0.06,0.24],
-             [0.8,0.02,0.18],[0.8,0.04,0.16],[0.8,0.06,0.14],[0.8,0.08,0.12],[0.8,0.1,0.1],[0.8,0.12,0.08],
-             [0.8,0.14,0.06],[0.8,0.16,0.04],[0.8,0.18,0.02],[0.8,0.2,0],[0.8,0,0.2]]
-    distr = [[0.8,0.2,0],[0.79,0.21,0],[0.78,0.22,0],[0.77,0.23,0],[0.76,0.24,0],[0.75,0.25,0],[0.74,0.26,0],[0.73,0.27,0],[0.72,0.28,0],[0.71,0.29,0],
-             [0.81,0.19,0],[0.82,0.18,0],[0.83,0.17,0],[0.84,0.16,0],[0.85,0.15,0]]
-    #distr = [[0.8,0.2,0],[0.76,0.19,0.05],[0.72,0.18,0.1],[0.78,0.22,0],[0.78,0.11,0.11],[0.78,0.12,0.1],[0.78,0.1,0.12]]
     predictions = []
-    with open('MSRParaphraseCorpus/MSR_easy.txt') as f:
+    with open('MSRParaphraseCorpus/MSR-easy-full.txt') as f:
         data = f.readlines()
-    f = open('testdata/output-2.txt', 'w')
+    #f = open('testdata/output-2.txt', 'w')
     block = []
     for each in data:
-        block.append(flex(getWords(each.lower())))
-    i = 1
-    while i+1 < len(block):
-        if int(block[i][0]) - int(block[i+1][0]) < 200 and int(block[i][0]) - int(block[i+1][0]) > -200:
-            t1 = block[i][1:]
-            t2 = block[i+1][1:]
-            s1 = agreg(t1)
-            s2 = agreg(t2)
-            s1 = unicode(s1, "utf-8")
-            p1, d1 = parse_text(parser, s1, 1)
-            s2 = unicode(s2, "utf-8")
-            p2, d2 = parse_text(parser, s2, 1)
-            t1 = flex(t1)
-            t2 = flex(t2)
-            t = union(t1, t2)
-            # -------------- sementic similarity between two sentences ------- #
-            similarity_ssv = ssv(t, t1, t2, model)
-            #print 'ssv ', similarity_ssv
+        every = each.split('\t')
+        block.append([every[0],every[1],agreg(flex(getWords(every[2].lower()))),agreg(flex(getWords(every[3].lower())))])
+    #print block
+    i = 0
+    while i < len(block):
+        s1 = block[i][2]
+        s2 = block[i][3]
+        s1 = unicode(s1, "utf-8")
+        p1, d1 = parse_text(parser, s1, 1)
+        s2 = unicode(s2, "utf-8")
+        p2, d2 = parse_text(parser, s2, 1)
+        t1 = getWords(s1)
+        t2 = getWords(s2)
+        t = union(t1, t2)
+        # -------------- sementic similarity between two sentences ------- #
+        similarity_ssv = ssv(t, t1, t2, model)
+        #print 'ssv ', similarity_ssv
 
-            # ----------------- word similarity between sentences ------------ #
-            similarity_wo = wo(t, t1, t2, model)
-            #print 'wo ', similarity_wo
+        # ----------------- word similarity between sentences ------------ #
+        similarity_wo = wo(t, t1, t2, model)
+        #print 'wo ', similarity_wo
 
-            # ---- dependency matrix based similarity ------------------------ #
-            similarity_dp = dp(t, t1, t2, d1, d2)
-            #similarity_dp = 0
-            #alpha = 0.8
-            z = 0
-            while z < len(distr):
-                similarity = float(distr[z][0])*similarity_ssv + float(distr[z][1])*similarity_wo + float(distr[z][2])*similarity_dp
-                with open('testdata/output-'+str(z)+'.txt', 'a') as f:
-                    f.write(str(similarity))
-                    f.write(' ')
-                    f.write(str(block[i][0]))
-                    f.write(' ')
-                    f.write(str(block[i+1][0]))
-                    f.write('\n')
-                z = z + 1
-            #similarity = 0.75*similarity_ssv + 0.15*similarity_wo + 0.10*similarity_dp
-            #print i, i+1
-            '''f.write(str(similarity))
-            f.write(' ')
-            f.write(str(block[i][0]))
-            f.write(' ')
-            f.write(str(block[i+1][0]))
-            f.write('\n')'''
-            #predictions.append([similarity, str(block[i][0]), str(block[i+1][0])])
-            i = i + 2
-        else:
-            i = i + 1
+        # ---- dependency matrix based similarity ------------------------ #
+        similarity_dp = dp(t, t1, t2, d1, d2, model)
+        #similarity_dp = 0
+        #alpha = 0.8
+        with open('testdata/singleton-output.txt','a') as f:
+            f.write(str(similarity_ssv)+'\t'+str(similarity_wo)+'\t'+str(similarity_dp)+'\t'+str(block[i][0])+'\t'+str(block[i][1])+'\n')
+        z = 0
+        '''while z < len(distr):
+            similarity = float(distr[z][0])*similarity_ssv + float(distr[z][1])*similarity_wo + float(distr[z][2])*similarity_dp
+            with open('testdata/output-'+str(z)+'.txt', 'a') as f:
+                f.write(str(similarity))
+                f.write(' ')
+                f.write(str(block[i][0]))
+                f.write(' ')
+                f.write(str(block[i][1]))
+                f.write('\n')
+            z = z + 1'''
+        i=i+1
+        #similarity = 0.75*similarity_ssv + 0.15*similarity_wo + 0.10*similarity_dp
+        #print i, i+1
+        '''f.write(str(similarity))
+        f.write(' ')
+        f.write(str(block[i][0]))
+        f.write(' ')
+        f.write(str(block[i+1][0]))
+        f.write('\n')'''
+        #predictions.append([similarity, str(block[i][0]), str(block[i+1][0])])
 
 def cross():
     # ------------ comparing with both test and train as we have not
@@ -327,7 +369,7 @@ def cross():
     m_accuracy = 0
     m_z = 0
     m_thresh = 0
-    thols = [0.45,0.47,0.49,0.50,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.60]
+    thols = [0.43,0.44,0.45,0.46,0.47,0.48,0.49,0.50,0.51,0.52,0.53,0.54,0.55,0.56,0.57,0.58,0.60]
     #thols = [0.55,0.555,0.558,0.5585,0.559,0.5595,0.56,0.561,0.562,0.565,0.57]
     thresh = 0.54
     s1 = 0
@@ -356,7 +398,7 @@ def cross():
     #print predictions[0][0], predictions[1][1], predictions[2][2]
     z = 0
     y = 0
-    while z < 15:
+    while z < len(distr):
         with open('testdata/output-'+str(z)+'.txt') as f:
             mypredictions = f.readlines()
         predictions = []
@@ -463,5 +505,88 @@ def cross():
     print '---------------------------------------'
     print m_z, m_thresh
     print m_accuracy
-predict()
-cross()
+
+def adv_cross():
+    with open('testdata/singleton-output.txt') as f:
+        predictions = f.readlines()
+    with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
+        MSRtrain = f.readlines()
+    with open('MSRParaphraseCorpus/MSR_paraphrase_test.txt') as f:
+        MSRtest = f.readlines()
+    train = []
+    test = []
+    for each in MSRtrain:
+        train.append(getWords(each))
+    for each in MSRtest:
+        test.append(getWords(each))
+    i = 0
+    tp = 0
+    tn = 0
+    fp = 0
+    fn = 0
+    thresh = 0.56
+    print len(train), len(test), len(predictions)
+    while i < len(train):
+        p = predictions[i].split('\t')
+        p[2] = float(p[2])
+        p[1] = float(p[1])
+        p[0] = float(p[0])
+        train[i][0] = int(train[i][0])
+        if p[2] < 0.6 and train[i][0] == 0:
+            tn = tn + 1
+        elif p[0] > 0.58 and train[i][0] == 1:
+            tp = tp + 1
+        else:
+            pred = p[0]*0.8 + p[1]*0.2
+            if pred > thresh:
+                if train[i][0] == 1:
+                    tp = tp + 1
+                else:
+                    fp = fp + 1
+            else:
+                if train[i][0] == 0:
+                    tn = tn + 1
+                else:
+                    fn = fn + 1
+        i = i + 1
+    j = 0
+    while j < len(test):
+        p = predictions[i].split('\t')
+        p[2] = float(p[2])
+        p[1] = float(p[1])
+        p[0] = float(p[0])
+        test[j][0] = int(test[j][0])
+        if p[2] < 0.6 and test[j][0] == 0:
+            tn = tn + 1
+        elif p[0] > 0.58 and test[j][0] == 1:
+            tp = tp + 1
+        else:
+            pred = p[0]*0.8 + p[1]*0.2
+            if pred > thresh:
+                if test[j][0] == 1:
+                    tp = tp + 1
+                else:
+                    fp = fp + 1
+            else:
+                if test[j][0] == 0:
+                    tn = tn + 1
+                else:
+                    fn = fn + 1
+        i = i + 1
+        j = j + 1
+    print 'tp ', tp
+    print 'tn ', tn
+    print 'fp ', fp
+    print 'fn ', fn
+    precision = (float(tp)) / (float(tp) + float(fp))
+    recall = (float(tp)) / (float(tp) + float(fn))
+    F1 = 2*precision*recall/(precision+recall)
+    accuracy = float(tp+tn) / float(tp+tn+fp+fn)
+    print 'accuracy ', accuracy
+    print 'F1 ', F1
+    
+
+adv_cross()
+
+#predict()
+#cross()

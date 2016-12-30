@@ -282,7 +282,9 @@ def test():
     t1 = "a quick brown dog jumps over the lazy fox"
     t2 = "a fast brown fox jumps over the lazy dog"
     #t2 = "he is a brown fox"
-    #t2 = "jumps over the lazy fox is a quick brown dog"
+    t2 = "jumps over the lazy fox is a quick brown dog"
+    t1 = "Many consider Maradona as the best player in soccer history"
+    t2 = "Maradona is one of the best soccer players"
     sentence_1 = unicode(t1, "utf-8")
     p1, d1 = parse_text(parser, sentence_1, 1)
     sentence_2 = unicode(t2, "utf-8")
@@ -294,8 +296,8 @@ def test():
     t = union(t1, t2)
     #print d1
     #print d2
-    similarity_dp = dp(t, t1, t2, d1, d2, model)
     similarity_dp = dp_old(t, t1, t2, d1, d2)
+    similarity_dp = dp(t, t1, t2, d1, d2, model)
     # -------------- sementic similarity between two sentences ------- #
     similarity_ssv = ssv(t, t1, t2, model)
     #print 'ssv ', similarity_ssv
