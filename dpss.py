@@ -269,13 +269,15 @@ def advance_ssv(t, t1, t2):
     v1 = []
     v2 = []
 
-
 def test():
     from spacy.en import English
     parser = English()
+    model = word2vec.load('./latents.bin')
     t1 = "a quick brown dog jumps over the lazy fox"
     t2 = "a quick brown fox jumps over the lazy dog"
     t2 = "jumps over the lazy fox is a quick brown dog"
+    t1="The DVD-CCA then appealed to the state Supreme Court."
+    t2="The DVD CCA appealed that decision to the U.S. Supreme Court."
     sentence_1 = unicode(t1, "utf-8")
     p1, d1 = parse_text(parser, sentence_1, 1)
     sentence_2 = unicode(t2, "utf-8")
@@ -285,8 +287,10 @@ def test():
     t1 = flex(t1)
     t2 = flex(t2)
     t = union(t1, t2)
-    #print d1
-    #print d2
+    print d1
+    print d2
+    print t1
+    print t2
     similarity_dp = dp(t, t1, t2, d1, d2, model)
     print similarity_dp
 
@@ -313,19 +317,25 @@ def predict():
     block = []
     for each in data:
         every = each.split('\t')
-        block.append([every[0],every[1],agreg(flex(getWords(every[2].lower()))),agreg(flex(getWords(every[3].lower())))])
+        block.append([every[0],every[1],agreg(flex(getWords(every[2]))),agreg(flex(getWords(every[3])))])
     #print block
     i = 0
     while i < len(block):
         s1 = block[i][2]
         s2 = block[i][3]
-        s1 = unicode(s1, "utf-8")
-        p1, d1 = parse_text(parser, s1, 1)
-        s2 = unicode(s2, "utf-8")
-        p2, d2 = parse_text(parser, s2, 1)
+        sent1 = unicode(s1, "utf-8")
+        p1, d1 = parse_text(parser, sent1, 1)
+        sent2 = unicode(s2, "utf-8")
+        p2, d2 = parse_text(parser, sent2, 1)
         t1 = getWords(s1)
         t2 = getWords(s2)
+        t1 = flex(t1)
+        t2 = flex(t2)
         t = union(t1, t2)
+        #print d1
+        #print d2
+        #print t1
+        #print t2
         # -------------- sementic similarity between two sentences ------- #
         similarity_ssv = ssv(t, t1, t2, model)
         #print 'ssv ', similarity_ssv
@@ -524,7 +534,12 @@ def adv_cross():
     tn = 0
     fp = 0
     fn = 0
+    t1=0
+    t2=0
+    t3=0
+    t4=0
     thresh = 0.56
+    zz= []
     print len(train), len(test), len(predictions)
     while i < len(train):
         p = predictions[i].split('\t')
@@ -574,6 +589,7 @@ def adv_cross():
                     fn = fn + 1
         i = i + 1
         j = j + 1
+
     print 'tp ', tp
     print 'tn ', tn
     print 'fp ', fp
@@ -584,9 +600,147 @@ def adv_cross():
     accuracy = float(tp+tn) / float(tp+tn+fp+fn)
     print 'accuracy ', accuracy
     print 'F1 ', F1
-    
+    print 'precision', precision
+    print 'recall ', recall
+    print '----------------'
 
-adv_cross()
 
+
+def double_cross():
+    with open('testdata/singleton-output.txt') as f:
+        predictions = f.readlines()
+    with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
+        MSRtrain = f.readlines()
+    with open('MSRParaphraseCorpus/MSR_paraphrase_test.txt') as f:
+        MSRtest = f.readlines()
+    train = []
+    test = []
+    for each in MSRtrain:
+        train.append(getWords(each))
+    for each in MSRtest:
+        test.append(getWords(each))
+    i = 0
+    tp = 0
+    tn = 0
+    fp = 0
+    fn = 0
+    t1=0
+    t2=0
+    t3=0
+    t4=0
+    thresh = 0.55
+    zz= []
+    while i < len(train):
+        zz.append(0)
+        p = predictions[i].split('\t')
+        p[2] = float(p[2])
+        p[1] = float(p[1])
+        p[0] = float(p[0])
+        train[i][0] = int(train[i][0])
+        if p[2] < 0.6:
+            zz[i] = 0
+        elif (p[2] + p[0])/2 > 0.60:
+            zz[i] = 1
+        else:
+            pred = p[0]*0.8 + p[1]*0.2
+            if pred > thresh:
+                zz[i]=1
+            else:
+                zz[i]=0
+        if p[1] < 0.5:
+            zz[i] =0
+        if p[2] > 0.70:
+            zz[i] = 1
+        i = i + 1
+    j = 0
+    while j < len(test):
+        zz.append(0)
+        p = predictions[i].split('\t')
+        p[2] = float(p[2])
+        p[1] = float(p[1])
+        p[0] = float(p[0])
+        test[j][0] = int(test[j][0])
+        if p[2] < 0.6:
+            zz[i] = 0
+        elif (p[2] + p[0])/2 > 0.60:
+            zz[i] = 1
+        else:
+            pred = p[0]*0.8 + p[1]*0.2
+            if pred > thresh:
+                zz[i]=1
+            else:
+                zz[i]=0
+        if p[1] < 0.5:
+            zz[i] =0
+        if p[2] > 0.70:
+            zz[i] = 1
+        i = i + 1
+        j = j + 1
+    print 'zz ', len(zz)
+    i=0
+    tp = 0
+    tn = 0
+    fp = 0
+    fn = 0
+    while i < len(train):
+        if zz[i] == 0 and train[i][0] == 0:
+            tn = tn + 1
+        if zz[i] == 0 and train[i][0] == 1:
+            fn = fn + 1
+        if zz[i] == 1 and train[i][0] == 1:
+            tp = tp + 1
+        if zz[i] == 1 and train[i][0] == 0:
+            fp = fp + 1
+        i = i + 1
+    j = 0
+    while j < len(test):
+        if zz[i] == 0 and test[j][0] == 0:
+            tn = tn + 1
+        if zz[i] == 0 and test[j][0] == 1:
+            fn = fn + 1
+        if zz[i] == 1 and test[j][0] == 1:
+            tp = tp + 1
+        if zz[i] == 1 and test[j][0] == 0:
+            fp = fp + 1
+        i = i + 1
+        j = j + 1
+    print 'tp ', tp
+    print 'tn ', tn
+    print 'fp ', fp
+    print 'fn ', fn
+    precision = (float(tp)) / (float(tp) + float(fp))
+    recall = (float(tp)) / (float(tp) + float(fn))
+    F1 = 2*precision*recall/(precision+recall)
+    accuracy = float(tp+tn) / float(tp+tn+fp+fn)
+    print 'accuracy ', accuracy
+    print 'F1 ', F1
+    print 'precision', precision
+    print 'recall ', recall
+    print '----------------'
+#
+#adv_cross()
+#test()
 #predict()
+double_cross()
 #cross()
+
+
+'''
+print int(p[3]),int(p[4]),int(train[i][1]),int(train[i][2])
+if int(train[i][1]) != int(p[3]):
+    print 'fuck it'
+    print p, train[i]
+    break
+if int(train[i][2]) != int(p[4]):
+    print 'fuck it'
+    print p, train[i]
+    break
+if int(test[j][1]) != int(p[3]):
+    print 'fuck it'
+    print p, test[i]
+    break
+if int(test[j][2]) != int(p[4]):
+    print 'fuck it'
+    print p, test[j]
+    break
+'''

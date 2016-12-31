@@ -285,6 +285,8 @@ def test():
     t2 = "jumps over the lazy fox is a quick brown dog"
     t1 = "Many consider Maradona as the best player in soccer history"
     t2 = "Maradona is one of the best soccer players"
+    t1="The DVD-CCA then appealed to the state Supreme Court."
+    t2="The DVD CCA appealed that decision to the U.S. Supreme Court."
     sentence_1 = unicode(t1, "utf-8")
     p1, d1 = parse_text(parser, sentence_1, 1)
     sentence_2 = unicode(t2, "utf-8")
