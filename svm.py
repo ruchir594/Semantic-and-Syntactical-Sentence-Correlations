@@ -85,7 +85,7 @@ def tree():
     train = []
     for each in MSRtrain:
         train.append(each.split('\t'))
-    with open('testdata/features-output.txt') as f:
+    with open('testdata/features-output-old.txt') as f:
         mypredictions = f.readlines()
     predictions = []
     for each in mypredictions:
@@ -100,7 +100,7 @@ def tree():
                   float(each[8]), float(each[9]), float(each[10]), float(each[11]), float(each[12]), float(each[13]), float(each[14]), float(each[15]),
                   float(each[16]), float(each[17]), float(each[18])])'''
         #X.append([float(each[3])*0.80 + float(each[1])*0.20, float(each[18]), float(each[17]), float(each[16]), float(each[12])])
-        X.append([float(each[3])*0.80 + float(each[1])*0.20, float(each[5]), float(each[6]), float(each[8]),float(each[11]), float(each[12]), float(each[18])])
+        X.append([float(each[3])*0.80 + float(each[1])*0.20, float(each[5]), float(each[6]), float(each[8]),float(each[9]),float(each[10]),float(each[11]), float(each[12]), float(each[18])])
     #print X
     Xtrain = X[0:len(Y)]
     Xtest = X[len(Y):]

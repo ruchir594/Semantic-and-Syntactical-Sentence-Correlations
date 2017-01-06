@@ -181,7 +181,7 @@ def predict():
             diff2 = -1*diff2
         with open('testdata/features-output.txt','a') as f:
             f.write(str(similarity_ssv)+'\t'+str(similarity_wo)+'\t'+str(similarity_dp)+'\t'+str(similarity_dp_cnze)+'\t'+str(c1)
-            +'\t'+str(f1)+'\t'+str(f2)+'\t'+str(f3)+'\t'+str(f4)+'\t'+str(f5)+'\t'+str(f6)+'\t'+str(f7)+'\t'+str(8)+'\t'+str(f9)
+            +'\t'+str(f1)+'\t'+str(f2)+'\t'+str(f3)+'\t'+str(f4)+'\t'+str(f5)+'\t'+str(f6)+'\t'+str(f7)+'\t'+str(f8)+'\t'+str(f9)
             +'\t'+str(f10)+'\t'+str(f11)+'\t'+str(f12)+'\t'+str(diff1)+'\t'+str(diff2)+'\t'+str(block[i][0])+'\t'+str(block[i][1])+'\n')
         z = 0
         i=i+1
