@@ -15,10 +15,12 @@ def cross():
         zz6 = f.readlines()
     with open('test-pred-test-svm-5.txt') as f:
         zz7 = f.readlines()
+    with open('test-pred-test-svm-6.txt') as f:
+        zz8 = f.readlines()
     z = []
     vote = []
-    for w1,w2,w3,w4,w5,w6,w7 in zip(zz, zz2, zz3, zz4, zz5, zz6, zz7):
-        c = Counter([w3,w5,w6,w2])
+    for w1,w2,w3,w4,w5,w6,w7,w8 in zip(zz, zz2, zz3, zz4, zz5, zz6, zz7, zz8):
+        c = Counter([w3,w8,w5,w6])
         value, count = c.most_common()[0]
         vote.append(value)
     zz = vote
