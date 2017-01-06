@@ -1,5 +1,5 @@
 import re, word2vec
-from dpss import ssv, wo, dp, flex, agreg, union, parse_text
+from dpss import ssv, wo, dp, flex, agreg, union, parse_text, dictlength
 def getWords(data):
     return re.compile(r"[\w]+").findall(data)
 
@@ -73,18 +73,13 @@ def predict():
         c1 = 0.8*similarity_ssv + 0.2*similarity_wo
         #c2 = similarity_dp*similarity_dp
         with open('testdata/singleton-output.txt','a') as f:
-            f.write(str(similarity_ssv)+'\t'+str(similarity_wo)+'\t'+str(similarity_dp)+'\t'+str(similarity_dp_cnze)+'\t'+str(c1)+'\t'+str(block[i][0])+'\t'+str(block[i][1])+'\n')
+            f.write(str(similarity_ssv)+'\t'+str(similarity_wo)+'\t'+str(similarity_dp)+'\t'+str(similarity_dp_cnze)+'\t'+str(block[i][0])+'\t'+str(block[i][1])+'\n')
         z = 0
         i=i+1
 
 def tree():
-    from sklearn import tree
-    from sklearn.ensemble import RandomForestClassifier
-    #X = [[0, 0,0], [0.6,0.6,0],[1, 1,1]]
-    #Y = [0, 0,1]
-    #clf = tree.DecisionTreeClassifier()
-    clf = RandomForestClassifier(n_estimators=2, max_depth=2)
-    #clf = clf.fit(X, Y)
+    from sklearn import svm
+    clf = svm.LinearSVC(max_iter=10000, intercept_scaling=2)
     with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
         MSRtrain = f.readlines()
     train = []
@@ -100,12 +95,12 @@ def tree():
         Y.append(int(each[0]))
     X = []
     for each in predictions:
-        #X.append([float(each[0]), float(each[1]), float(each[2]), float(each[3]), float(each[4]), float(each[1])+float(each[2]), float(each[0])*float(each[0])])
-        #X.append([float(each[5])])
-        X.append([float(each[3])*0.80 + float(each[1])*0.20,float(each[0]), float(each[1]), float(each[2]), float(each[3]), float(each[4]),
+        '''X.append([float(each[0]), float(each[1]), float(each[2]), float(each[3]), float(each[4]),
                   float(each[3])*float(each[3])*float(each[1]), float(each[3])*float(each[3]), float(each[5]), float(each[6]), float(each[7]),
                   float(each[8]), float(each[9]), float(each[10]), float(each[11]), float(each[12]), float(each[13]), float(each[14]), float(each[15]),
-                  float(each[16]), float(each[17]),float(each[18])])
+                  float(each[16]), float(each[17]), float(each[18])])'''
+        #X.append([float(each[3])*0.80 + float(each[1])*0.20, float(each[18]), float(each[17]), float(each[16]), float(each[12])])
+        X.append([float(each[3])*0.80 + float(each[1])*0.20, float(each[5]), float(each[6]), float(each[11]), float(each[12]), float(each[18])])
     #print X
     Xtrain = X[0:len(Y)]
     Xtest = X[len(Y):]
@@ -113,16 +108,16 @@ def tree():
     clf = clf.fit(Xtrain, Y)
     pred_train = clf.predict(Xtrain)
     pred_test = clf.predict(Xtest)
-    with open('test-pred-test-rf.txt', 'w') as f:
+    with open('test-pred-test-svm.txt', 'w') as f:
         for each in pred_test:
             f.write(str(each)+'\n')
-    with open('test-pred-train-rf.txt', 'w') as f:
+    with open('test-pred-train-svm.txt', 'w') as f:
         for each in pred_train:
             f.write(str(each)+'\n')
 
 def cross():
     print '-----train-----'
-    """with open('test-pred-train-rf.txt') as f:
+    """with open('test-pred-train-svm.txt') as f:
         zz = f.readlines()
     with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
         MSRtrain = f.readlines()
@@ -159,7 +154,7 @@ def cross():
     print 'precision', precision
     print 'recall ', recall"""
     print '-----test------'
-    with open('test-pred-test-rf.txt') as f:
+    with open('test-pred-test-svm.txt') as f:
         zz = f.readlines()
     with open('MSRParaphraseCorpus/MSR_paraphrase_test.txt') as f:
         MSRtest = f.readlines()
@@ -200,3 +195,4 @@ def cross():
 #predict()
 tree()
 cross()
+#print dictlength()

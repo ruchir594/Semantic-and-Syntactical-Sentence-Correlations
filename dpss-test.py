@@ -80,15 +80,22 @@ def ssv(t, t1, t2, model):
             baset1 = [0] * 99
             baset1.append(0.001)
             baset1 = numpy.random.rand(100,1)
+            if hashing.has_key(t1[i]) == True:
+                baset1 = hashing[t1[i]]
+            else:
+                baset1 = numpy.random.rand(100,1)
+                hashing[t1[i]] = baset1
             #print "word not found v1 ssv " + t1[i]
         v1.append(baset1)
     for i in range(len(t2)):
         try:
             baset2 = model[t2[i]]
         except Exception, e:
-            baset2 = [0] * 99
-            baset2.append(0.001)
-            baset2 = numpy.random.rand(100,1)
+            if hashing.has_key(t2[i]) == True:
+                baset2 = hashing[t2[i]]
+            else:
+                baset2 = numpy.random.rand(100,1)
+                hashing[t2[i]] = baset2
             #print "word not found v2 ssv " + t2[i]
         v2.append(baset2)
     #print v1, v2
@@ -101,9 +108,11 @@ def ssv(t, t1, t2, model):
                 baset = model[t[i]]
             except Exception, e:
                 #print 'exception at ' + t[i]
-                baset = [0] * 99
-                baset.append(0.001)
-                baset = numpy.random.rand(100,1)
+                if hashing.has_key(t[i]) == True:
+                    baset = hashing[t[i]]
+                else:
+                    baset = numpy.random.rand(100,1)
+                    hashing[t[i]] = baset
                 #print "word not found t[i] ssv " + t[i]
             #print suit_sim(baset, v1)
             s1.append(suit_sim(baset, v1))
@@ -114,9 +123,11 @@ def ssv(t, t1, t2, model):
                 baset = model[t[i]]
             except Exception, e:
                 #print 'exception at ' + t[i]
-                baset = [0] * 99
-                baset.append(0.001)
-                baset = numpy.random.rand(100,1)
+                if hashing.has_key(t[i]) == True:
+                    baset = hashing[t[i]]
+                else:
+                    baset = numpy.random.rand(100,1)
+                    hashing[t[i]] = baset
                 #print "word not found t[i] ssv " + t[i]
             s2.append(suit_sim(baset, v2))
     #print 'sss ',s1, s2
@@ -139,6 +150,8 @@ def norm(r):
         total = total + each*each
     return math.sqrt(total)
 
+hashing = dict()
+
 #
 # Li, Y., McLean, D., Bandar, Z. A., O'Shea, J. D., and Crockett, K. (2006)
 # Sentence Similarity Based on Semantic Nets and Corpus Statistics.
@@ -156,17 +169,24 @@ def wo(t, t1, t2, model):
         except Exception, e:
             baset1 = [0] * 99
             baset1.append(0.001)
-            baset1 = numpy.random.rand(100,1)
-            #print "word not found v1 wo " + t1[i]
+            if hashing.has_key(t1[i]) == True:
+                baset1 = hashing[t1[i]]
+            else:
+                baset1 = numpy.random.rand(100,1)
+                hashing[t1[i]] = baset1
+            #print "word not found v1 wo " + t1[i],  baset1
         v1.append(baset1)
     for i in range(len(t2)):
         try:
             baset2 = model[t2[i]]
         except Exception, e:
-            baset2 = [0] * 99
-            baset2.append(0.001)
-            baset2 = numpy.random.rand(100,1)
+            if hashing.has_key(t2[i]) == True:
+                baset2 = hashing[t2[i]]
+            else:
+                baset2 = numpy.random.rand(100,1)
+                hashing[t2[i]] = baset2
             #print "word not found v2 wo " + t2[i]
+            #print "word not found v2 wo " + t2[i],  baset2
         v2.append(baset2)
 
     for i in range(len(t)):
@@ -176,9 +196,11 @@ def wo(t, t1, t2, model):
             try:
                 baset = model[t[i]]
             except Exception, e:
-                baset = [0] * 99
-                baset.append(0.001)
-                baset = numpy.random.rand(100,1)
+                if hashing.has_key(t[i]) == True:
+                    baset = hashing[t[i]]
+                else:
+                    baset = numpy.random.rand(100,1)
+                    hashing[t[i]] = baset
                 #print "word not found t[i] wo " + t[i]
             r1.append(suit_index(baset, v1))
         if t[i] in t2:
@@ -187,9 +209,11 @@ def wo(t, t1, t2, model):
             try:
                 baset = model[t[i]]
             except Exception, e:
-                baset = [0] * 99
-                baset.append(0.001)
-                baset = numpy.random.rand(100,1)
+                if hashing.has_key(t[i]) == True:
+                    baset = hashing[t[i]]
+                else:
+                    baset = numpy.random.rand(100,1)
+                    hashing[t[i]] = baset
                 #print "word not found t[i] wo " + t[i]
             r2.append(suit_index(baset, v2))
     #print r1, r2
@@ -210,18 +234,22 @@ def dp(t, t1, t2, d1, d2, model):
         try:
             baset1 = model[t1[i]]
         except Exception, e:
-            baset1 = [0] * 99
-            baset1.append(0.001)
-            baset1 = numpy.random.rand(100,1)
+            if hashing.has_key(t1[i]) == True:
+                baset1 = hashing[t1[i]]
+            else:
+                baset1 = numpy.random.rand(100,1)
+                hashing[t1[i]] = baset1
             #print "word not found v1 wo " + t1[i]
         v1.append(baset1)
     for i in range(len(t2)):
         try:
             baset2 = model[t2[i]]
         except Exception, e:
-            baset2 = [0] * 99
-            baset2.append(0.001)
-            baset2 = numpy.random.rand(100,1)
+            if hashing.has_key(t2[i]) == True:
+                baset2 = hashing[t2[i]]
+            else:
+                baset2 = numpy.random.rand(100,1)
+                hashing[t2[i]] = baset2
             #print "word not found v2 wo " + t2[i]
         v2.append(baset2)
     # not the v1 and v2 have all vectors
@@ -234,7 +262,11 @@ def dp(t, t1, t2, d1, d2, model):
             try:
                 baset = model[t[i]]
             except Exception, e:
-                baset = numpy.random.rand(100,1)
+                if hashing.has_key(t[i]) == True:
+                    baset = hashing[t[i]]
+                else:
+                    baset = numpy.random.rand(100,1)
+                    hashing[t[i]] = baset
             m1[i][i] = suit_sim(baset, v1)*4
         if t[i] in t2:
             m2[i][i] = 1*4
@@ -242,7 +274,11 @@ def dp(t, t1, t2, d1, d2, model):
             try:
                 baset = model[t[i]]
             except Exception, e:
-                baset = numpy.random.rand(100,1)
+                if hashing.has_key(t[i]) == True:
+                    baset = hashing[t[i]]
+                else:
+                    baset = numpy.random.rand(100,1)
+                    hashing[t[i]] = baset
             m2[i][i] = suit_sim(baset, v2)*4
     for i in range(len(d1)):
         d1[i][1] = 'DEP'
@@ -263,11 +299,11 @@ def dp(t, t1, t2, d1, d2, model):
 
     print m1
     print m2
-    similarity_dp = 1 - float(numpy.count_nonzero(m1-m2)) / float((numpy.count_nonzero(m1) + numpy.count_nonzero(m2)))
-    print 'cnze ', similarity_dp
+    similarity_dp_cnze = 1 - float(numpy.count_nonzero(m1-m2)) / float((numpy.count_nonzero(m1) + numpy.count_nonzero(m2)))
+    print 'cnze ', similarity_dp_cnze
     similarity_dp = 1 - numpy.linalg.norm(m1-m2)/(numpy.linalg.norm(m1)+numpy.linalg.norm(m2))
     print 'norm ', similarity_dp
-    return similarity_dp
+    return similarity_dp, similarity_dp_cnze
 #dp(["hello", "a","b","c"],[],[],[],[])
 
 def advance_ssv(t, t1, t2):
@@ -285,8 +321,8 @@ def test():
     t2 = "jumps over the lazy fox is a quick brown dog"
     t1 = "Many consider Maradona as the best player in soccer history"
     t2 = "Maradona is one of the best soccer players"
-    t1="The DVD-CCA then appealed to the state Supreme Court."
-    t2="The DVD CCA appealed that decision to the U.S. Supreme Court."
+    t1="The DVD-CCA then appealed to the state Supreme Court albert. hdujhuju".lower()
+    t2="The DVD CCA appealed that decision to the U.S. Supreme Court albert einstein bhijjnjd.".lower()
     sentence_1 = unicode(t1, "utf-8")
     p1, d1 = parse_text(parser, sentence_1, 1)
     sentence_2 = unicode(t2, "utf-8")
@@ -296,10 +332,12 @@ def test():
     t1 = flex(t1)
     t2 = flex(t2)
     t = union(t1, t2)
+
     #print d1
     #print d2
     similarity_dp = dp_old(t, t1, t2, d1, d2)
-    similarity_dp = dp(t, t1, t2, d1, d2, model)
+    similarity_dp, similarity_dp_cnze = dp(t, t1, t2, d1, d2, model)
+    print similarity_dp, similarity_dp_cnze
     # -------------- sementic similarity between two sentences ------- #
     similarity_ssv = ssv(t, t1, t2, model)
     #print 'ssv ', similarity_ssv
@@ -512,3 +550,4 @@ def dp_old(t, t1, t2, d1, d2):
 test()
 #predict()
 #cross()
+print len(hashing)
