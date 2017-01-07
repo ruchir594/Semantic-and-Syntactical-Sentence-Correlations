@@ -113,16 +113,16 @@ def tree():
     clf = clf.fit(Xtrain, Y)
     pred_train = clf.predict(Xtrain)
     pred_test = clf.predict(Xtest)
-    with open('test-pred-test-rf.txt', 'w') as f:
+    with open('data/test-pred-test-rf.txt', 'w') as f:
         for each in pred_test:
             f.write(str(each)+'\n')
-    with open('test-pred-train-rf.txt', 'w') as f:
+    with open('data/test-pred-train-rf.txt', 'w') as f:
         for each in pred_train:
             f.write(str(each)+'\n')
 
 def cross():
     print '-----train-----'
-    """with open('test-pred-train-rf.txt') as f:
+    """with open('data/test-pred-train-rf.txt') as f:
         zz = f.readlines()
     with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
         MSRtrain = f.readlines()
@@ -159,7 +159,7 @@ def cross():
     print 'precision', precision
     print 'recall ', recall"""
     print '-----test------'
-    with open('test-pred-test-rf.txt') as f:
+    with open('data/test-pred-test-rf.txt') as f:
         zz = f.readlines()
     with open('MSRParaphraseCorpus/MSR_paraphrase_test.txt') as f:
         MSRtest = f.readlines()

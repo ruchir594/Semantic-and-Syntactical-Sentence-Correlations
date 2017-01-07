@@ -1,8 +1,8 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf600
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf760
 {\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Bold;\f2\fnil\fcharset0 Menlo-Regular;
 }
 {\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;}
-{\*\expandedcolortbl;\csgray\c100000;\csgray\c0;\csgray\c100000;}
+{\*\expandedcolortbl;;\csgray\c0;\csgray\c100000;}
 \paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
 
@@ -121,4 +121,25 @@ accuracy  0.819858645061\
 F1  0.875491480996\
 precision 0.817716447808\
 recall  0.942051282051\
-}
+\
+\'97 ^^^ wrong results ^^^ \'97\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f1\b \cf2 \cb3 Results on Jan 6\
+\
+SVM\
+\
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+
+\f2\b0 \cf2 \cb3 X.append([float(each[3])*0.80 + float(each[1])*0.20, float(each[5]), float(each[6]), float(each[8]),float(each[9]),float(each[10]),float(each[11]),\
+        float(each[18]), float(each[1]), float(each[2])])\
+\
+tp  1018\
+tn  261\
+fp  317\
+fn  129\
+accuracy  0.741449275362\
+F1  0.820306204674\
+precision 0.762546816479\
+recall  0.887532693984}

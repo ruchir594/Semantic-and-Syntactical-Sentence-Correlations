@@ -1,27 +1,29 @@
 from collections import Counter
 def cross():
     print '-----test------'
-    with open('test-pred-test-rf-1.txt') as f:
+    with open('data/test-pred-test-rf-1.txt') as f:
         zz = f.readlines()
-    with open('test-pred-test-rf-2.txt') as f:
+    with open('data/test-pred-test-rf-2.txt') as f:
         zz2 = f.readlines()
-    with open('test-pred-test-svm-1.txt') as f:
+    with open('data/test-pred-test-svm-1.txt') as f:
         zz3 = f.readlines()
-    with open('test-pred-test-svm-2.txt') as f:
+    with open('data/test-pred-test-svm-2.txt') as f:
         zz4 = f.readlines()
-    with open('test-pred-test-svm-3.txt') as f:
+    with open('data/test-pred-test-svm-3.txt') as f:
         zz5 = f.readlines()
-    with open('test-pred-test-svm-4.txt') as f:
+    with open('data/test-pred-test-svm-4.txt') as f:
         zz6 = f.readlines()
-    with open('test-pred-test-svm-5.txt') as f:
+    with open('data/test-pred-test-svm-5.txt') as f:
         zz7 = f.readlines()
-    with open('test-pred-test-svm-6.txt') as f:
+    with open('data/test-pred-test-svm-6.txt') as f:
         zz8 = f.readlines()
-    with open('test-pred-test-svm-7.txt') as f:
+    with open('data/test-pred-test-svm-7.txt') as f:
         zz9 = f.readlines()
+    with open('data/test-pred-test-svm-8.txt') as f:
+        zz10 = f.readlines()
     z = []
     vote = []
-    for w1,w2,w3,w4,w5,w6,w7,w8,w9 in zip(zz, zz2, zz3, zz4, zz5, zz6, zz7, zz8, zz9):
+    for w1,w2,w3,w4,w5,w6,w7,w8,w9,w10 in zip(zz, zz2, zz3, zz4, zz5, zz6, zz7, zz8, zz9, zz10):
         c = Counter([w3,w9,w5,w1])
         value, count = c.most_common()[0]
         vote.append(value)
