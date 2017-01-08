@@ -52,6 +52,14 @@ def flex(t):
             tminus.append(each)
     return tminus
 
+def polish(t):
+    tminus = []
+    remobe = ['PUNCT', 'DET']
+    for each in t:
+        if each[1] not in remobe:
+            tminus.append(each[0])
+    return tminus
+
 def agreg(t):
     sent = ''
     for each in t:

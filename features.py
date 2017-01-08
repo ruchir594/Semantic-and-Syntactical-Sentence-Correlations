@@ -1,7 +1,8 @@
-import re, word2vec
+import re, word2vec, numpy
 from dpss import ssv, wo, dp, flex, agreg, union, parse_text, getWords, intersection, getWordsX
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.translate import bleu_score
+
 
 lmtzr = WordNetLemmatizer()
 
@@ -57,6 +58,41 @@ def dp_precision_recall_lemma(d1,d2):
     precision = float(cnt) / len(d1)
     recall = float(cnt) / len(d2)
     return precision, recall
+
+def per(t1, t2):
+    cnt = 0
+    cnt2 = 0
+    for each in t1:
+        if each not in t2:
+            cnt = cnt + 1
+    for each in t2:
+        if each not in t1:
+            cnt2 = cnt2 + 1
+    cnt = max(cnt, cnt2)
+    return 1 - float(cnt)/float(max(len(t1), len(t2)))
+
+def wer(r, h):
+    """
+    This is a function that calculate the word error rate in ASR.
+    You can use it like this: wer("what is it".split(), "what is".split())
+    """
+    #build the matrix
+    d = numpy.zeros((len(r)+1)*(len(h)+1), dtype=numpy.uint8).reshape((len(r)+1, len(h)+1))
+    for i in range(len(r)+1):
+        for j in range(len(h)+1):
+            if i == 0: d[0][j] = j
+            elif j == 0: d[i][0] = i
+    for i in range(1,len(r)+1):
+        for j in range(1, len(h)+1):
+            if r[i-1] == h[j-1]:
+                d[i][j] = d[i-1][j-1]
+            else:
+                substitute = d[i-1][j-1] + 1
+                insert = d[i][j-1] + 1
+                delete = d[i-1][j] + 1
+                d[i][j] = min(substitute, insert, delete)
+    result = float(d[len(r)][len(h)]) / max(len(r), len(h))
+    return 1 - result
 
 def parent():
     from spacy.en import English
@@ -164,7 +200,7 @@ def predict():
         f1, f2 = unigrap_precision_recall(t1,t2)
         f3, f4 = unigrap_precision_recall(t1_l, t2_l)
 
-        # ---- bleu features ------------------------ #
+        # ---- BLEU features ------------------------ #
         f5, f6 = BLEU(t1,t2)
         f7, f8 = BLEU(t1_l, t2_l)
 
@@ -179,10 +215,16 @@ def predict():
             diff1 = -1*diff1
         if diff2 < 0:
             diff2 = -1*diff2
+
+        # ----- word error rate (WER) & position independent WER ---#
+        f13 = wer(t1, t2)
+        f14 = per(t1, t2)
+
+
         with open('testdata/features-output.txt','a') as f:
             f.write(str(similarity_ssv)+'\t'+str(similarity_wo)+'\t'+str(similarity_dp)+'\t'+str(similarity_dp_cnze)+'\t'+str(c1)
             +'\t'+str(f1)+'\t'+str(f2)+'\t'+str(f3)+'\t'+str(f4)+'\t'+str(f5)+'\t'+str(f6)+'\t'+str(f7)+'\t'+str(f8)+'\t'+str(f9)
-            +'\t'+str(f10)+'\t'+str(f11)+'\t'+str(f12)+'\t'+str(diff1)+'\t'+str(diff2)+'\t'+str(block[i][0])+'\t'+str(block[i][1])+'\n')
+            +'\t'+str(f10)+'\t'+str(f11)+'\t'+str(f12)+'\t'+str(diff1)+'\t'+str(diff2)+'\t'+str(f13)+'\t'+str(f14)+'\t'+str(block[i][0])+'\t'+str(block[i][1])+'\n')
         z = 0
         i=i+1
 

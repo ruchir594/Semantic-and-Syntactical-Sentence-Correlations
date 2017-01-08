@@ -45,6 +45,14 @@ def flex(t):
             tminus.append(each)
     return tminus
 
+def polish(t):
+    tminus = []
+    remobe = ['PUNCT', 'DET']
+    for each in t:
+        if each[1] not in remobe:
+            tminus.append(each[0])
+    return tminus
+
 def agreg(t):
     sent = ''
     for each in t:
@@ -331,6 +339,10 @@ def test():
     t2 = getWords(t2)
     t1 = flex(t1)
     t2 = flex(t2)
+    t1_p = polish(p1)
+    t2_p = polish(p2)
+    print t1, t1_p
+    print t2, t2_p
     t = union(t1, t2)
 
     #print d1

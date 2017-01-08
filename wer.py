@@ -4,6 +4,18 @@
 import sys
 import numpy
 
+def per(t1, t2):
+    cnt = 0
+    cnt2 = 0
+    for each in t1:
+        if each not in t2:
+            cnt = cnt + 1
+    for each in t2:
+        if each not in t1:
+            cnt2 = cnt2 + 1
+    cnt = max(cnt, cnt2)
+    return 1 - float(cnt)/float(max(len(t1), len(t2)))
+
 def wer(r, h):
     """
     This is a function that calculate the word error rate in ASR.
@@ -24,8 +36,8 @@ def wer(r, h):
                 insert = d[i][j-1] + 1
                 delete = d[i-1][j] + 1
                 d[i][j] = min(substitute, insert, delete)
-    result = float(d[len(r)][len(h)]) / len(r) * 100
-    return result
+    result = float(d[len(r)][len(h)]) / max(len(r), len(h))
+    return 1 - result
     result = str("%.2f" % result) + "%"
 
     #find out the manipulation steps
