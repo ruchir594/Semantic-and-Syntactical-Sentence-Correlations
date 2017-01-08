@@ -4,13 +4,14 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn import svm
 from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import cross_val_score
 from dpss import ssv, wo, dp, flex, agreg, union, parse_text, getWords, intersection, getWordsX
 
 clf1 = LogisticRegression(random_state=1)
 clf2 = RandomForestClassifier(random_state=1)
 clf3 = GaussianNB()
 clf4 = svm.LinearSVC(max_iter=10000)
-clf5 = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(8, 2), random_state=1)
+clf5 = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(8, 2), random_state=1, activation='relu')
 def blast():
     with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
         MSRtrain = f.readlines()
@@ -47,6 +48,9 @@ def blast():
     with open('data/test-pred-train-blast.txt', 'w') as f:
         for each in pred_train:
             f.write(str(each)+'\n')
+    # --- cross validation ---
+    #scores = cross_val_score(clf5, Xtrain, Y, cv=10)
+    #print scores
 
 def cross():
     print '-----test------'
