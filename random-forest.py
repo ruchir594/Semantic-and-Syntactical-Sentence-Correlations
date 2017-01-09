@@ -69,7 +69,7 @@ def onetimemake():
             f.write(each)
 
 
-onetimemake()
+#onetimemake()
 
 def predict():
     from spacy.en import English
@@ -125,9 +125,9 @@ def tree():
     from sklearn.ensemble import RandomForestClassifier
     #X = [[0, 0,0], [0.6,0.6,0],[1, 1,1]]
     #Y = [0, 0,1]
-    #clf = tree.DecisionTreeClassifier()
-    clf = RandomForestClassifier(n_estimators=2, max_depth=2)
-    #clf = clf.fit(X, Y)
+    #clf = tree.DecisionTreeClassifier(
+    clf = RandomForestClassifier(n_estimators=2, max_depth=2, max_features=5, min_samples_split=2, random_state=1)
+    #clf = clf.fit(X, Y2, random_state=1
     with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
         MSRtrain = f.readlines()
     train = []
@@ -143,7 +143,8 @@ def tree():
         Y.append(int(each[0]))
     X = []
     for each in predictions:
-        X.append([float(each[3])*0.80 + float(each[1])*0.20, float(each[5]), float(each[6]), float(each[8]),float(each[9]),float(each[10]),float(each[11]), float(each[12]), float(each[18])])
+        X.append([float(each[3])*0.80 + float(each[1])*0.20, float(each[5]), float(each[6]), float(each[8]),float(each[9]),float(each[10]),
+         float(each[11]), float(each[12]), float(each[18]), float(each[2]), float(each[19]), float(each[20]), float(each[21])])
         #X.append([float(each[5])])
         '''X.append([float(each[3])*0.80 + float(each[1])*0.20,float(each[0]), float(each[1]), float(each[2]), float(each[3]), float(each[4]),
                   float(each[3])*float(each[3])*float(each[1]), float(each[3])*float(each[3]), float(each[5]), float(each[6]), float(each[7]),

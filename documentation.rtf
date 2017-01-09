@@ -1,11 +1,27 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf600
-{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;}
-{\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red255\green255\blue255;}
-{\*\expandedcolortbl;\csgray\c100000;\csgray\c0;\csgray\c100000;}
+{\rtf1\ansi\ansicpg1252\cocoartf1504\cocoasubrtf760
+{\fonttbl\f0\fswiss\fcharset0 ArialMT;\f1\fswiss\fcharset0 Helvetica;\f2\fnil\fcharset0 Menlo-Regular;
+}
+{\colortbl;\red255\green255\blue255;\red25\green25\blue25;\red0\green0\blue0;\red66\green1\blue120;
+\red0\green0\blue233;\red0\green0\blue0;\red255\green255\blue255;\red28\green28\blue28;\red255\green255\blue255;
+\red82\green35\blue83;\red39\green79\blue173;\red0\green0\blue0;}
+{\*\expandedcolortbl;;\cssrgb\c12941\c12941\c12941;\cssrgb\c0\c0\c0;\cssrgb\c33333\c10196\c54510;
+\cssrgb\c0\c0\c93333;\csgray\c0;\csgray\c100000;\cssrgb\c14510\c14510\c14510;\cssrgb\c100000\c100000\c100000;
+\cssrgb\c40000\c20000\c40000;\cssrgb\c20000\c40000\c73333;\csgenericrgb\c0\c0\c0;}
 \paperw11900\paperh16840\margl1440\margr1440\vieww10800\viewh8400\viewkind0
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\deftab720
+\pard\pardeftab720\partightenfactor0
 
-\f0\fs24 \cf0 There are three types of Sentence Similarity Measures\
+\f0\fs32 \cf2 \expnd0\expndtw0\kerning0
+Dear Professor Liu,\cf0 \
+\
+\cf2 Good news. I think I have paraphrase algorithm which outperforms other algorithms on MSRP Corpus. Microsoft Research Paraphrase Corpus.\'a0{\field{\*\fldinst{HYPERLINK "https://www.microsoft.com/en-us/download/details.aspx?id=52398"}}{\fldrslt \cf4 \ul \ulc4 https://www.microsoft.com/en-us/download/details.aspx?id=52398}}\cf0 \
+\
+\cf2 Algorithm: finds similarity between two sentences. i.e. finding if two sentences are paraphrases of each other. It is a classification problem. Two sentences are given and algorithm predicts if they are paraphrase (similar).\
+\pard\pardeftab720\partightenfactor0
+
+\f1\fs24 \cf0 \kerning1\expnd0\expndtw0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 There are three types of Sentence Similarity Measures\
 \
 1. Word overlap Measures\
 2. TF-IDF Measures\
@@ -13,21 +29,53 @@
 \
 3a. Sentence Semantic Similarity Measure\
 3b. Word Order Similarity (syntactic)\
+\pard\pardeftab720\partightenfactor0
+\cf2 \expnd0\expndtw0\kerning0
+3c. Dependency parser\'a0Based\'a0semantic\'a0similarity measure (my own) \
 \
-The combination of Semantic and Syntactic Measure is proved to be effective\
+3c is an improvement upon 3a. Given two sentences, 3a builds a vector for each input sentence and cosine of those two gives a similarity score [1]. My 3c builds a matrix for each sentence and cosine of two gives a similarity score. It is a natural progression which uses a dependency parser (Spacy.io) to build the matrix. \
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \kerning1\expnd0\expndtw0 The combination of Semantic and Syntactic Measure is proved to be effective\cf2 \expnd0\expndtw0\kerning0
+\
+\pard\pardeftab720\partightenfactor0
+\cf2 The 3a and 3b are implemented in \cf6 \cb7 \kerning1\expnd0\expndtw0 \CocoaLigature0 Paper [2] actually registers accuracy of 0.671 but my tests registers higher accuracy because I used Word2Vec to find similarity between two words which is more powerful approach than an approach given in Paper 2. \
+\
+In my tests, I trained a neural network with given training set and used the test sets to calculate precision and recall.\cf0 \cb1 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 \expnd0\expndtw0\kerning0
+Standalone performance of combination of 3a and 3b gives accuracy of 
+\f2\fs22 \cf6 \cb7 \kerning1\expnd0\expndtw0 \CocoaLigature0 0.692753623188 with F1 
+\fs24 score 0.799394398183. \
+
+\f1 Standalone performance of combination of 3c and 3b gives accuracy of 
+\f2\fs22 0.713043478261 with F1 score 0.805041354864\
+
+\f1 \
+
+\fs24 The dependency based metrics similarity measure  outperforms the vector based similarity measure. \cf0 \cb1 \CocoaLigature1 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
 \
 Reference\
 \
 1.  Li, Y., McLean, D., Bandar, Z. A., O'Shea, J. D., and Crockett, K. (2006)  Sentence Similarity Based on Semantic Nets and Corpus Statistics. IEEE Transactions on Knowledge and Data Engineering 18, 8, 1138-1150.\
+\pard\pardeftab720\partightenfactor0
+\cf2 \expnd0\expndtw0\kerning0
+http://ieeexplore.ieee.org/abstract/document/1644735/?reload=true\cf0 \kerning1\expnd0\expndtw0 \
 \pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
-\cf0 <add link>\
-\
+\cf0 \
 2. {\field{\*\fldinst{HYPERLINK "https://www.google.com/search?client=safari&rls=en&q=The+Evaluation+of+Sentence+Similarity+Measures&ie=UTF-8&oe=UTF-8"}}{\fldrslt The Evaluation of Sentence Similarity Measures}}\
-<add link>\
-\
+\pard\pardeftab720\partightenfactor0
+\cf2 \expnd0\expndtw0\kerning0
+http://www.cis.drexel.edu/faculty/thu/research-papers/dawak-547.pdf\cf0 \kerning1\expnd0\expndtw0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
 Dataset: MSRP Corpus (Microsoft Research Paraphrase Corpus)\
 \
-Combined similarity of Semantic and Syntactical got a \
+In Paper 2, Combined similarity of Semantic and Syntactical got a \
 accuracy 0.671\
 F1 0.8\
 Precision 0.674\
@@ -41,15 +89,94 @@ https://aclweb.org/aclwiki/index.php?title=Paraphrase_Identification_(State_of_t
 The best Unsupervised algorithm has Accuracy = 0.741 with F1 score  = 0.824\
 The best Supervised algorithm has Accuracy = 0.804 with F1 score = 0.859\
 \
-My algorithm which is Unsupervised. i.e. it does not touch Either Train of Test Dataset. \
+\'97\'97\'97\'97\'97\'97\'97\'97\
 \
-My algorithms combined score on both Train and Test are\'85.\
+Machine Translation metrics have been used for paraphrase identification. They work well for this task. In fact, some of the best performing algorithms (supervised) used MT metrics.\
+\
+Reference: \
+3. \cf8 \cb9 \expnd0\expndtw0\kerning0
+Filice, S., Da San Martino, G., and Moschitti, A. (2015). {\field{\*\fldinst{HYPERLINK "http://www.aclweb.org/anthology/P15-1097"}}{\fldrslt \cf10 \cb9 Structural Representations for Learning Relations between Pairs of Texts}}
+\fs28 \cf10 \cb9  
+\fs24 \cf0 \cb1 \kerning1\expnd0\expndtw0 http://aclweb.org/anthology/I/I05/I05-5003.pdf\
+\
+4. \cf12 \cb9 \expnd0\expndtw0\kerning0
+Madnani, N., Tetreault, J., and Chodorow, M. (2012). {\field{\*\fldinst{HYPERLINK "http://www.aclweb.org/anthology-new/N/N12/N12-1019.pdf"}}{\fldrslt Re-examining Machine Translation Metrics for Paraphrase Identification}}\
+\
+5. \cf8 Wan, S., Dras, M., Dale, R., and Paris, C. (2006). {\field{\*\fldinst{HYPERLINK "http://www.alta.asn.au/events/altw2006/proceedings/swan-final.pdf"}}{\fldrslt \cf10 \cb9 Using dependency-based features to take the "para-farce" out of paraphrase}}\cf10 \cb9  http://www.alta.asn.au/events/altw2006/proceedings/swan-final.pdf\
+\
+6. \cf8 \cb9 Finch, A., and H, Y.S., and Sumita, E. (2005). {\field{\*\fldinst{HYPERLINK "http://aclweb.org/anthology/I/I05/I05-5003.pdf"}}{\fldrslt \cf10 \cb9 Using machine translation evaluation techniques to determine sentence-level semantic equivalence}}\cf12 \
+\
+I extracted around 30 features present in these papers. The final version of my Neural Network used only about 12 features. \
 \
 \pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
 
-\f1\fs22 \cf2 \cb3 \CocoaLigature0 accuracy  0.819858645061\
-F1  0.875491480996\
-precision 0.817716447808\
-recall  0.942051282051
-\f0\fs24 \cf0 \cb1 \CocoaLigature1 \
+\f2\fs22 \cf6 \cb7 \kerning1\expnd0\expndtw0 \CocoaLigature0 tp  998\
+tn  336\
+fp  242\
+fn  149\
+accuracy  0.773333333333\
+F1  0.836196062003\
+precision 0.804838709677\
+recall  0.870095902354\
+\
+The 12 feature features I have used are\
+\
+1. 
+\f1\fs24 \cf12 \cb9 \expnd0\expndtw0\kerning0
+\CocoaLigature1  3c (2 nd degree distance between two matrix) + 3b\
+2.    3c (1st degree distance between two matrix)\
+\
+N-gram overlap features \
+\
+3. Unigram Precision [5]\
+4. Unigram Recall [5]\
+5. Lemmetized unigram Recall [5]\
+6. BLEU precision (4-gram) [5]\
+7. BLEU recall (4-gram) [5]\
+8. Lemmatised BLEU precision (4-gram) [5]\
+9. BLEU precision (3-gram)\
+\
+Surface features\
+\
+10. Absolute difference in sentence lengths (words) [5]\
+\
+Machine Translation Matrics\
+\
+11. Word Error Rate [6] \
+12. Position independent Word Error Rate [6]\
+\
+
+\f2\fs22 \cf6 \cb7 \kerning1\expnd0\expndtw0 \CocoaLigature0 \
+\
+
+\f1\fs24 However, I could not verify the claim in Reference 4 (Mandnani N) that METEOR score classifies with accuracy of 73.1 with F1 score of 81.0. I only got accuracy of 71.56 in WEKA (same tool used by the paper)\
+\
+\pard\pardeftab720\partightenfactor0
+
+\fs32 \cf2 \cb1 \expnd0\expndtw0\kerning0
+\CocoaLigature1 If this is acceptable and we could publish a paper, would love to schedule a\'a0Skype call to explain my algorithm 3c.\'a0
+\f0 \cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 I would like to know what I have done is\'a0scientifically acceptable as far as prediction algorithms go. If yes, or no, what should be the next steps.\'a0
+\f0 \cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 Thank you so much for your time Professor.
+\f0 \cf0 \
+\pard\pardeftab720\partightenfactor0
+
+\f1 \cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 Yours\'a0Sincerely,
+\f0 \cf0 \
+
+\f1 \cf2 Ruchir Patel
+\f2\fs22 \cf6 \cb7 \kerning1\expnd0\expndtw0 \CocoaLigature0 \
+\pard\tx560\tx1120\tx1680\tx2240\tx2800\tx3360\tx3920\tx4480\tx5040\tx5600\tx6160\tx6720\pardirnatural\partightenfactor0
+\cf6 \
 }
