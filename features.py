@@ -1,5 +1,5 @@
-import re, word2vec, numpy
-from dpss import ssv, wo, dp, flex, agreg, union, parse_text, getWords, intersection, getWordsX
+import re, word2vec, numpy, pyter
+from dpss import ssv, wo, dp, flex, agreg, union, parse_text, getWords, intersection, getWordsX, polish
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.translate import bleu_score
 
@@ -13,6 +13,21 @@ def lemma(t1):
 def BLEU(t1,t2):
     precision = bleu_score.sentence_bleu([t1], t2)
     recall = bleu_score.sentence_bleu([t2], t1)
+    return precision, recall
+
+def BLEU3(t1,t2):
+    precision = bleu_score.sentence_bleu([t1], t2,  weights=(0.33333,0.33333,0.33333))
+    recall = bleu_score.sentence_bleu([t2], t1,  weights=(0.33333,0.33333,0.33333))
+    return precision, recall
+
+def BLEU2(t1,t2):
+    precision = bleu_score.sentence_bleu([t1], t2,  weights=(0.5, 0,5))
+    recall = bleu_score.sentence_bleu([t2], t1,  weights=(0.5, 0.5))
+    return precision, recall
+
+def BLEU1(t1,t2):
+    precision = bleu_score.sentence_bleu([t1], t2,  weights=(1,0))
+    recall = bleu_score.sentence_bleu([t2], t1,  weights=(1,0))
     return precision, recall
 
 def unigrap_precision_recall(t1,t2):
@@ -133,6 +148,24 @@ def parent():
     print 'regular ', prec, rec
     print 'lemmaed ', prec_lemma, rec_lemma
 
+    print '--- BLEU3 ---'
+    prec, rec = BLEU3(t1,t2)
+    prec_lemma, rec_lemma = BLEU3(t1_l, t2_l)
+    print 'regular ', prec, rec
+    print 'lemmaed ', prec_lemma, rec_lemma
+
+    print '--- BLEU2 ---'
+    prec, rec = BLEU2(t1,t2)
+    prec_lemma, rec_lemma = BLEU2(t1_l, t2_l)
+    print 'regular ', prec, rec
+    print 'lemmaed ', prec_lemma, rec_lemma
+
+    print '--- BLEU1 ---'
+    prec, rec = BLEU1(t1,t2)
+    prec_lemma, rec_lemma = BLEU1(t1_l, t2_l)
+    print 'regular ', prec, rec
+    print 'lemmaed ', prec_lemma, rec_lemma
+
     print '--- dependency based ---'
     prec, rec = dp_precision_recall(d1,d2)
     prec_lemma, rec_lemma = dp_precision_recall_lemma(d1,d2)
@@ -177,6 +210,8 @@ def predict():
         t2 = flex(t2)
         t1_l = lemma(t1)
         t2_l = lemma(t2)
+        #t1 = polish(p1)
+        #t2 = polish(p2)
         t = union(t1, t2)
         #print d1
         #print d2
@@ -220,12 +255,31 @@ def predict():
         f13 = wer(t1, t2)
         f14 = per(t1, t2)
 
+        # ------ BLEU3 -----#
+        f15, f16 = BLEU3(t1,t2)
+        f17, f18 = BLEU3(t1_l, t2_l)
+
+        # ------ BLEU2 -----#
+        f19, f20 = BLEU2(t1,t2)
+        f21, f22 = BLEU2(t1_l, t2_l)
+
+        # ---- F score ----#
+        f23 = 2*f5*f6/(f5+f6)
+
+        # ---- TER ---- #
+        f24 = pyter.ter(t1,t2)
+        f25 = pyter.ter(t2,t1)
+        f26 = pyter.ter(t1_l, t2_l)
+        f27 = pyter.ter(t2_l, t1_l)
 
         with open('testdata/features-output.txt','a') as f:
             f.write(str(similarity_ssv)+'\t'+str(similarity_wo)+'\t'+str(similarity_dp)+'\t'+str(similarity_dp_cnze)+'\t'+str(c1)
             +'\t'+str(f1)+'\t'+str(f2)+'\t'+str(f3)+'\t'+str(f4)+'\t'+str(f5)+'\t'+str(f6)+'\t'+str(f7)+'\t'+str(f8)+'\t'+str(f9)
-            +'\t'+str(f10)+'\t'+str(f11)+'\t'+str(f12)+'\t'+str(diff1)+'\t'+str(diff2)+'\t'+str(f13)+'\t'+str(f14)+'\t'+str(block[i][0])+'\t'+str(block[i][1])+'\n')
+            +'\t'+str(f10)+'\t'+str(f11)+'\t'+str(f12)+'\t'+str(diff1)+'\t'+str(diff2)+'\t'+str(f13)+'\t'+str(f14)+'\t'+str(f15)
+            +'\t'+str(f16)+'\t'+str(f17)+'\t'+str(f18)+'\t'+str(f19)+'\t'+str(f20)+'\t'+str(f21)+'\t'+str(f22)+'\t'+str(f23)
+            +'\t'+str(f24)+'\t'+str(f25)+'\t'+str(f26)+'\t'+str(f27)+'\t'+str(block[i][0])+'\t'+str(block[i][1])+'\n')
         z = 0
         i=i+1
 
+#parent()
 predict()

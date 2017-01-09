@@ -28,6 +28,49 @@ def onetime():
         for each in g:
             f.write(each)
 
+def onetimesplit():
+    with open('MSRParaphraseCorpus/MSR-easy-full.txt') as f:
+        MSR = f.readlines()
+    line = []
+    for each in MSR:
+        line.append(each.split('\t'))
+    with open('MSRParaphraseCorpus/MSR-split-1.txt', 'w') as f:
+        for each in line:
+            f.write(each[2]+'\n')
+    with open('MSRParaphraseCorpus/MSR-split-2.txt', 'w') as f:
+        for each in line:
+            f.write(each[3])
+
+def onetimemake():
+    with open('testdata/METEOR-scores.txt') as f:
+        scores = f.readlines()
+    with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
+        MSRtrain = f.readlines()
+    with open('MSRParaphraseCorpus/MSR_paraphrase_test.txt') as f:
+        MSRtest = f.readlines()
+    g = []
+    g.append('METEOR  score \t True value')
+    i=0
+    j=0
+    while i < len(MSRtrain):
+        a = MSRtrain[i].split('\t')
+        g.append(scores[j].split('\t')[1][:-1] + ',' + a[0] + '\n')
+        i=i+1
+        j=j+1
+    i=0
+    while i < len(MSRtest):
+        a = MSRtest[i].split('\t')
+        g.append(scores[j].split('\t')[1][:-1] + ',' + a[0] + '\n')
+        i=i+1
+        j=j+1
+    print len(g), len(MSRtest), len(MSRtrain)
+    with open('testdata/METEOR-score-true.txt', 'w') as f:
+        for each in g:
+            f.write(each)
+
+
+onetimemake()
+
 def predict():
     from spacy.en import English
     parser = English()
