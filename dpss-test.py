@@ -138,7 +138,7 @@ def ssv(t, t1, t2, model):
                     hashing[t[i]] = baset
                 #print "word not found t[i] ssv " + t[i]
             s2.append(suit_sim(baset, v2))
-    #print 'sss ',s1, s2
+    print 'sss ',s1, s2
     similarity = 1 - spatial.distance.cosine(s1, s2)
     return similarity
 
@@ -224,7 +224,7 @@ def wo(t, t1, t2, model):
                     hashing[t[i]] = baset
                 #print "word not found t[i] wo " + t[i]
             r2.append(suit_index(baset, v2))
-    #print r1, r2
+    print 'wo ', r1, r2
     r = []
     q = []
     for i in range(len(r1)):
@@ -326,11 +326,13 @@ def test():
     t1 = "a quick brown dog jumps over the lazy fox"
     t2 = "a fast brown fox jumps over the lazy dog"
     #t2 = "he is a brown fox"
-    t2 = "jumps over the lazy fox is a quick brown dog"
-    t1 = "Many consider Maradona as the best player in soccer history"
+    #t2 = "jumps over the lazy fox is a quick brown dog"
+    '''t1 = "Many consider Maradona as the best player in soccer history"
     t2 = "Maradona is one of the best soccer players"
     t1="The DVD-CCA then appealed to the state Supreme Court albert. hdujhuju".lower()
     t2="The DVD CCA appealed that decision to the U.S. Supreme Court albert einstein bhijjnjd.".lower()
+    t1="Amrozi accused his brother, whom he called the witness, of deliberately distorting his evidence.".lower()
+    t2="Referring to him as only the witness, Amrozi accused his brother of deliberately distorting his evidence.".lower()'''
     sentence_1 = unicode(t1, "utf-8")
     p1, d1 = parse_text(parser, sentence_1, 1)
     sentence_2 = unicode(t2, "utf-8")
@@ -344,10 +346,11 @@ def test():
     print t1, t1_p
     print t2, t2_p
     t = union(t1, t2)
+    print t
 
     #print d1
     #print d2
-    similarity_dp = dp_old(t, t1, t2, d1, d2)
+    #similarity_dp = dp_old(t, t1, t2, d1, d2)
     similarity_dp, similarity_dp_cnze = dp(t, t1, t2, d1, d2, model)
     print similarity_dp, similarity_dp_cnze
     # -------------- sementic similarity between two sentences ------- #
