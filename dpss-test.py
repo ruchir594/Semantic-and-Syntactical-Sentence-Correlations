@@ -326,7 +326,7 @@ def test():
     t1 = "a quick brown dog jumps over the lazy fox"
     t2 = "a fast brown fox jumps over the lazy dog"
     #t2 = "he is a brown fox"
-    #t2 = "jumps over the lazy fox is a quick brown dog"
+    t2 = "what jumps over the lazy fox is a quick brown dog"
     '''t1 = "Many consider Maradona as the best player in soccer history"
     t2 = "Maradona is one of the best soccer players"
     t1="The DVD-CCA then appealed to the state Supreme Court albert. hdujhuju".lower()
@@ -345,6 +345,7 @@ def test():
     t2_p = polish(p2)
     print t1, t1_p
     print t2, t2_p
+    print d1
     t = union(t1, t2)
     print t
 
