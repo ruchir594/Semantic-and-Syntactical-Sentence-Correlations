@@ -3,15 +3,18 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn import svm
-from sklearn.neural_network import MLPClassifier
+from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.model_selection import cross_val_score
 from dpss import ssv, wo, dp, flex, agreg, union, parse_text, getWords, intersection, getWordsX
+from sklearn.preprocessing import StandardScaler
+#from sknn.mlp import Classifier, Layer
 
 clf1 = LogisticRegression(random_state=0)
 clf2 = RandomForestClassifier(random_state=0)
 clf3 = GaussianNB()
 clf4 = svm.LinearSVC(max_iter=10000)
-clf5 = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(100, 6), random_state=0, activation='relu')
+clf5 = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(100, 6), random_state=0, activation='relu', warm_start=True, epsilon=1e-08)
+scaler = StandardScaler()
 
 def blast():
     with open('MSRParaphraseCorpus/MSR_paraphrase_train.txt') as f:
@@ -19,7 +22,7 @@ def blast():
     train = []
     for each in MSRtrain:
         train.append(each.split('\t'))
-    with open('testdata/features-output.txt') as f:
+    with open('testdata/features-output-2.txt') as f:
         mypredictions = f.readlines()
     with open('testdata/METEOR-scores.txt') as f:
         METEOR_scores = f.readlines()
@@ -49,10 +52,25 @@ def blast():
     Xtrain = X[0:len(Y)]
     Xtest = X[len(Y):]
     print len(Xtrain), len(Y), len(Xtest)
-    eclf1 = VotingClassifier(estimators=[('nn', clf5)], voting='hard')
+    '''scaler.fit(Xtrain)
+    Xtrain = scaler.transform(Xtrain)
+    Xtest = scaler.transform(Xtest)'''
+    eclf1 = VotingClassifier(estimators=[('nn2', clf5)], voting='hard')
     eclf1 = eclf1.fit(Xtrain, Y)
     pred_train = eclf1.predict(Xtrain)
     pred_test = eclf1.predict(Xtest)
+    '''nn = Classifier(
+    layers=[
+        Layer("Rectifier", units=100),
+        Layer("Softmax")],
+    learning_rate=0.02,
+    n_iter=10)
+    Y = np.array(Y)
+    Xtrain = np.array(Xtrain)
+    Xtest = np.array(Xtest)
+    nn.fit(Xtrain, Y)
+    pred_train = nn.predict(Xtrain)
+    pred_test = nn.predict(Xtest)'''
     with open('data/test-pred-test-blast.txt', 'w') as f:
         for each in pred_test:
             f.write(str(each)+'\n')
