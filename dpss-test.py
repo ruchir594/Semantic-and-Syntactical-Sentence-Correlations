@@ -25,15 +25,18 @@ def getWords(data):
 def getWordsX(data):
     return re.compile(r"[\w'.]+").findall(data)
 
-def union(t1, t2):
+def union(t1, t2, v1, v2):
     t = []
-    for each in t1:
-        if each not in t:
-            t.append(each)
-    for each in t2:
-        if each not in t:
-            t.append(each)
-    return t
+    v = []
+    for i in range(len(t1)):
+        if t1[i] not in t:
+            t.append(t1[i])
+            v.append(v1[i])
+    for i in range(len(t2)):
+        if t2[i] not in t:
+            t.append(t2[i])
+            v.append(v2[i])
+    return t, v
 
 def flex(t):
     tminus = []
@@ -142,6 +145,22 @@ def ssv(t, t1, t2, model):
     similarity = 1 - spatial.distance.cosine(s1, s2)
     return similarity
 
+def ssv_fast(t, t1, t2, v, v1, v2):
+    s1 = []
+    s2 = []
+    for i in range(len(t)):
+        if t[i] in t1:
+            s1.append(1)
+        else:
+            s1.append(suit_sim(v[i], v1))
+        if t[i] in t2:
+            s2.append(1)
+        else:
+            s2.append(suit_sim(v[i], v2))
+    print 'sss ',s1, s2
+    similarity = 1 - spatial.distance.cosine(s1, s2)
+    return similarity
+
 def suit_index(b, v):
     delta = 0.6
     r = []
@@ -224,6 +243,30 @@ def wo(t, t1, t2, model):
                     hashing[t[i]] = baset
                 #print "word not found t[i] wo " + t[i]
             r2.append(suit_index(baset, v2))
+    print 'wo ', r1, r2
+    r = []
+    q = []
+    for i in range(len(r1)):
+        r.append(r1[i]-r2[i])
+        q.append(r1[i]+r2[i])
+    r = norm(r)
+    q = norm(q)
+    #print r,q
+    return (1 - r/q)
+
+def wo_fast(t, t1, t2, v, v1, v2):
+    delta = 0.6
+    r1 = []
+    r2 = []
+    for i in range(len(t)):
+        if t[i] in t1:
+            r1.append(t1.index(t[i])+1)
+        else:
+            r1.append(suit_index(v[i], v1))
+        if t[i] in t2:
+            r2.append(t2.index(t[i])+1)
+        else:
+            r2.append(suit_index(v[i], v2))
     print 'wo ', r1, r2
     r = []
     q = []
@@ -320,8 +363,8 @@ def advance_ssv(t, t1, t2):
 
 
 def test():
-    from spacy.en import English
-    parser = English()
+    #from spacy.en import English
+    #parser = English()
     model = word2vec.load('./latents.bin')
     t1 = "a quick brown dog jumps over the lazy fox"
     t2 = "a fast brown fox jumps over the lazy dog"
@@ -334,32 +377,59 @@ def test():
     t1="Amrozi accused his brother, whom he called the witness, of deliberately distorting his evidence.".lower()
     t2="Referring to him as only the witness, Amrozi accused his brother of deliberately distorting his evidence.".lower()'''
     sentence_1 = unicode(t1, "utf-8")
-    p1, d1 = parse_text(parser, sentence_1, 1)
+    #p1, d1 = parse_text(parser, sentence_1, 1)
     sentence_2 = unicode(t2, "utf-8")
-    p2, d2 = parse_text(parser, sentence_2, 1)
+    #p2, d2 = parse_text(parser, sentence_2, 1)
     t1 = getWords(t1)
     t2 = getWords(t2)
     t1 = flex(t1)
     t2 = flex(t2)
-    t1_p = polish(p1)
-    t2_p = polish(p2)
-    print t1, t1_p
-    print t2, t2_p
-    print d1
-    t = union(t1, t2)
+    #t1_p = polish(p1)
+    #t2_p = polish(p2)
+    #print t1, t1_p
+    #print t2, t2_p
+    #print d1
+    v=[]
+    v1=[]
+    v2=[]
+
+    for i in range(len(t1)):
+        try:
+            baset1 = model[t1[i]]
+        except Exception, e:
+            if hashing.has_key(t1[i]) == True:
+                baset1 = hashing[t1[i]]
+            else:
+                baset1 = numpy.random.rand(100,1)
+                hashing[t1[i]] = baset1
+        v1.append(baset1)
+    for i in range(len(t2)):
+        try:
+            baset2 = model[t2[i]]
+        except Exception, e:
+            if hashing.has_key(t2[i]) == True:
+                baset2 = hashing[t2[i]]
+            else:
+                baset2 = numpy.random.rand(100,1)
+                hashing[t2[i]] = baset2
+        v2.append(baset2)
+
+    t, v = union(t1, t2, v1, v2)
     print t
+
 
     #print d1
     #print d2
     #similarity_dp = dp_old(t, t1, t2, d1, d2)
-    similarity_dp, similarity_dp_cnze = dp(t, t1, t2, d1, d2, model)
+    similarity_dp, similarity_dp_cnze = 0, 0
+    #similarity_dp, similarity_dp_cnze = dp(t, t1, t2, d1, d2, model)
     print similarity_dp, similarity_dp_cnze
     # -------------- sementic similarity between two sentences ------- #
-    similarity_ssv = ssv(t, t1, t2, model)
+    similarity_ssv = ssv_fast(t, t1, t2, v, v1, v2)
     #print 'ssv ', similarity_ssv
 
     # ----------------- word similarity between sentences ------------ #
-    similarity_wo = wo(t, t1, t2, model)
+    similarity_wo = wo_fast(t, t1, t2, v, v1, v2)
     print similarity_ssv, similarity_wo, similarity_dp
 
 def dp_old(t, t1, t2, d1, d2):
@@ -389,4 +459,10 @@ def dp_old(t, t1, t2, d1, d2):
     print 'old similarity_dp ', similarity_dp_1
     return similarity_dp_1
 
+import time
+start = time.time()
 test()
+done = time.time()
+elapsed = done - start
+print 'time elapsed '
+print(elapsed)
