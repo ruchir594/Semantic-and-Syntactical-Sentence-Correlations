@@ -427,7 +427,6 @@ def test():
     # -------------- sementic similarity between two sentences ------- #
     similarity_ssv = ssv_fast(t, t1, t2, v, v1, v2)
     #print 'ssv ', similarity_ssv
-
     # ----------------- word similarity between sentences ------------ #
     similarity_wo = wo_fast(t, t1, t2, v, v1, v2)
     print similarity_ssv, similarity_wo, similarity_dp

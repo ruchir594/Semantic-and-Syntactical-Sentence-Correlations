@@ -281,5 +281,5 @@ def predict():
         z = 0
         i=i+1
 
-#parent()
+parent()
 predict()
